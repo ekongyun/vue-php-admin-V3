@@ -66,7 +66,6 @@ function generateRouter(item, isParent) {
   // component: 判断如果是一级菜单component: Layout
   console.log(item.component)
 
-
   var router = {
     path: item.path,
     name: item.name,
