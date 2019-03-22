@@ -17,6 +17,22 @@ export function createMenu(form) {
   })
 }
 
+// 编辑按钮
+export function updateMenu(form) {
+  return request({
+    url: '/sys/menu/edit',
+    method: 'post',
+    data: form
+  })
+}
+// 删除按钮
+export function deleteMenu(form) {
+  return request({
+    url: '/sys/menu/del',
+    method: 'post',
+    data: form
+  })
+}
 // 查询按钮
 export function viewMenuTree(rmvFile, filename) {
   return request({
