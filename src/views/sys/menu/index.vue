@@ -6,7 +6,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" size="mini" icon="el-icon-plus" v-perm="['/sys/menu/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" v-perm="['/sys/menu/download']" @click="handleDownload">{{ $t('table.export') }}</el-button>
       <el-tag>扩展节点</el-tag>
-      <el-switch v-model="defaultExpandAll" active-color="#13ce66" inactive-color="#ff4949" @change="reset" />
+      <el-switch v-model="defaultExpandAll" active-color="#13ce66" inactive-color="#ff4949" />
     </div>
 
     <tree-table ref="TreeTable" :data="tableData" :default-expand-all="defaultExpandAll" :columns="columns" border default-children="children" @selection-change="selectChange">
@@ -47,7 +47,15 @@
           <el-input v-model.trim="temp.redirect" placeholder="面包屑组件重定向,例 /sys/menu, 可留空" />
         </el-form-item>
         <el-form-item v-if="temp.type !== 2" label="图标">
-          <el-input v-model.trim="temp.icon" placeholder="系统管理/图标管理里复制图标名称, 例 email" />
+          <el-row>
+            <el-col :span="22">
+              <el-input v-model.trim="temp.icon" placeholder="系统管理/图标管理里复制图标名称, 例 email" />
+            </el-col>
+            <el-col :span="2">
+              <svg-icon :icon-class="temp.icon" />
+            </el-col>
+          </el-row>
+
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
@@ -344,29 +352,33 @@ export default {
     },
     handleDelete(row) {
       // this.$refs.TreeTable.delete(row)
-      if (row.children) {
-        this.$notify({
-          //  title: '错误',
-          message: row.title + ' - 存在子节点不能删除',
-          type: 'error'
-        })
-        return
-      }
-      const tempData = {
-        'id': row.id,
-        'title': row.title
-      }
-      // 调用api删除数据
-      deleteMenu(tempData).then(res => {
-        // 如果删除成功，后台重新更新数据,否则不更新数据
-        if (res.type === 'success') {
-          this.getData()
+      this.$confirm("确认删除选中记录吗？[菜单名称: " + row.title + "]", "提示", {
+        type: "warning"
+      }).then(() => {
+        if (row.children) {
+          this.$notify({
+            //  title: '错误',
+            message: row.title + ' - 存在子节点不能删除',
+            type: 'error'
+          })
+          return
         }
-        this.dialogFormVisible = false
-        this.$notify({
-          //  title: '错误',
-          message: res.message,
-          type: res.type
+        const tempData = {
+          'id': row.id,
+          'title': row.title
+        }
+        // 调用api删除数据
+        deleteMenu(tempData).then(res => {
+          // 如果删除成功，后台重新更新数据,否则不更新数据
+          if (res.type === 'success') {
+            this.getData()
+          }
+          this.dialogFormVisible = false
+          this.$notify({
+            //  title: '错误',
+            message: res.message,
+            type: res.type
+          })
         })
       })
     },
