@@ -40,6 +40,9 @@
         <el-form-item label="路由" prop="path">
           <el-input v-model.trim="temp.path" :placeholder="menuTypeList[temp.type] + '路由, 例 /sys, /sys/menu'" />
         </el-form-item>
+        <el-form-item v-if="dialogStatus !== 'create'" label="路由别名" prop="name">
+          <el-input v-model.trim="temp.name" placeholder="@view component name 必须与该路由别名一致" />
+        </el-form-item>
         <el-form-item v-if="temp.type === 1" label="组件" prop="component">
           <el-input v-model.trim="temp.component" placeholder="@/views/目录下相对组件路径,  例 sys/menu/index" />
         </el-form-item>
@@ -91,7 +94,11 @@ import Treeselect from '@riophae/vue-treeselect'
 // import the styles
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
+import random from 'string-random'
+
 export default {
+  name: 'snIcvR_sys_menu',
+  // 所以在编写路由 router 和路由对应的 view component 的时候一定要确保 两者的 name 是完全一致的。
   // register the component Treeselect, TreeTable
   components: { TreeTable, Treeselect },
   directives: { waves, perm },
@@ -139,6 +146,7 @@ export default {
       rules: {
         title: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
         path: [{ required: true, message: '请输入菜单url', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入唯一路由别名', trigger: 'blur' }],
         component: [{ required: true, message: '请输入组件url', trigger: 'blur' }]
       },
       columns: [
@@ -156,6 +164,10 @@ export default {
         {
           label: '菜单路由',
           key: 'path'
+        },
+        {
+          label: '路由别名',
+          key: 'name'
         },
         {
           label: '图标',
@@ -203,14 +215,15 @@ export default {
   },
 
   created() {
-    console.log('this.$route.path...', this.$route.path)
-    console.log('this.$store.state.user.ctrlperm', this.$store.state.user.ctrlperm)
+    // console.log('this.$route.path...', this.$route.path)
+    // console.log('this.$store.state.user.ctrlperm', this.$store.state.user.ctrlperm)
     this.getData()
   },
   methods: {
     getData() {
       // import { createMenu, getTreeOptions, getMenuTree } from '@/api/menu'
       getMenuTree().then(res => {
+        console.log('getMenuTree', res)
         this.tableData = res.data
       })
       getTreeOptions().then(res => {
@@ -228,26 +241,11 @@ export default {
       this.dialogFormVisible = false
       console.log(this.tempItem.id)
     },
-    addMenuItem(row, type) {
-      if (type === 'children') {
-        this.$refs.TreeTable.addChild(row, { name: 'child', timeLine: this.randomNum() })
-      }
-
-      if (type === 'brother') {
-        this.$refs.TreeTable.addBrother(row, { name: 'brother', timeLine: this.randomNum() })
-      }
-    },
     deleteItem(row) {
       this.$refs.TreeTable.delete(row)
     },
     selectChange(val) {
       console.log(val)
-    },
-    randomNum() {
-      // return 1~100
-      const max = 4194240
-      const min = 1000000
-      return Math.floor(Math.random() * (max - min + 1) + min)
     },
     message(row) {
       this.$message.info(row.event)
@@ -269,7 +267,9 @@ export default {
     handleCreate() {
       console.log('handleCreate...click')
       this.resetTemp()
-      console.log(this.temp)
+      for(let i=0;i<9;i++){
+        console.log(random(6, { specials: false, numbers: false, letters: true }))  
+      }
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -279,11 +279,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('createData...valid')
-
-          // 处理路由别名生成唯一
-          this.temp.name = this.temp.path.replace(/\//g, '_') + '_' + this.randomNum()
-          console.log(this.temp)
+          // 处理路由别名生成唯一 /sys/menu
+          this.temp.name = random(6, { specials: false, numbers: false, letters: true }) + this.temp.path.replace(/\//g, '_')
+          console.log('createData valid done...', this.temp)
 
           // 调用api创建数据入库
           createMenu(this.temp).then(res => {
@@ -324,6 +322,7 @@ export default {
             redirect: this.temp.redirect,
             listorder: this.temp.listorder
           }
+          console.log(tempData)
           // TODO: 增加校验 rules: 
           if (tempData.pid === tempData.id) {
             this.$notify({

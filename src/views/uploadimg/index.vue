@@ -41,7 +41,7 @@ import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { rmvupfile, onsubmit } from '@/api/uploadimg'
 
 export default {
-  name: 'Uploadimg',
+  name: 'rAfbcB_sysx_uploadimg',
   components: {
     vueDropzone: vue2Dropzone
   },

@@ -53,7 +53,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Xiangjun',
+  name: 'AleSGF_sysx_xiangjun',
   data() {
     return {
     }

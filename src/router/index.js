@@ -74,7 +74,7 @@ export const constantRouterMap = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true, affix: true }
+        meta: { title: 'dashboard', icon: 'dashboard', noCache: false, affix: true }
       }
     ]
   },
@@ -91,31 +91,31 @@ export const constantRouterMap = [
       }
     ]
   },
-  {
-    path: '/uploadimg',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Uploadimg',
-        component: () => import('@/views/uploadimg/index'),
-        meta: { title: '上传证件照', icon: 'form' }
-      }
-    ]
-  },
+  // {
+  //   path: '/uploadimg',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Uploadimg',
+  //       component: () => import('@/views/uploadimg/index'),
+  //       meta: { title: '上传证件照', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
-  {
-    path: '/xiangjun',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Xiangjun',
-        component: () => import('@/views/xiangjun/index'),
-        meta: { title: 'vue课堂测试', icon: 'form' }
-      }
-    ]
-  },
+  // {
+  //   path: '/xiangjun',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Xiangjun',
+  //       component: () => import('@/views/xiangjun/index'),
+  //       meta: { title: 'vue课堂测试', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/guide',

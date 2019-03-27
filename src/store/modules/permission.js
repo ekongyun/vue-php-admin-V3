@@ -61,7 +61,7 @@ function convertRouter(asyncRouterMap) {
 
 function generateRouter(item, isParent) {
   // 表单 输入 path： /sys/menu
-  // name 由最后一个 menu 取首字母大写_ 随机代码 用户保持唯一性
+  // name string-random 生成唯一字符串 xxxoo_sys_menu 形式 6个随机字符 + path 转换
   // redirect： 判断如果是一级菜单 noredirect
   // component: 判断如果是一级菜单component: Layout
   console.log(item.component)
@@ -82,12 +82,12 @@ function generateRouter(item, isParent) {
   return router
 }
 
-export const componentsMap = {
-  // example_table: () => import('@/views/table/index'),
-  // example_tree: () => import('@/views/tree/index'),
-  // form_index: () => import('@/views/form/index')
-  menu: () => import('@/views/sys/menu/index')
-}
+// export const componentsMap = {
+//   // example_table: () => import('@/views/table/index'),
+//   // example_tree: () => import('@/views/tree/index'),
+//   // form_index: () => import('@/views/form/index')
+//   menu: () => import('@/views/sys/menu/index')
+// }
 
 const permission = {
   state: {
