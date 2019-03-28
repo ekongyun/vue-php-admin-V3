@@ -4,7 +4,9 @@ import Layout from '@/views/layout/Layout'
 
 const componentsRouter = {
   path: '/components',
-  component: Layout,
+  // component: Layout,
+  // 作为二级嵌套路由指定上 具体组件， Layout与父组件冲突
+  component: () => import('@/views/components-demo/index'),
   redirect: 'noredirect',
   name: 'ComponentDemo',
   meta: {

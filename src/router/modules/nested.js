@@ -4,7 +4,9 @@ import Layout from '@/views/layout/Layout'
 
 const nestedRouter = {
   path: '/nested',
-  component: Layout,
+  // component: Layout,
+  // 作为二级嵌套路由指定上 具体组件， Layout与父组件冲突
+  component: () => import('@/views/nested/index'),
   redirect: '/nested/menu1/menu1-1',
   name: 'Nested',
   meta: {

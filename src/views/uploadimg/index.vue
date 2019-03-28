@@ -61,7 +61,7 @@ export default {
         phone: ''
       },
       dropzoneOptions: {
-        url: 'http://www.cirest.com:8889/api/v1/uploadimg/upload',
+        url: 'http://www.cirest.com:8889/api/v2/uploadimg/upload',
         // 最大文件大小，单位是 MB
         maxFilesize: 10,
         dictFileTooBig: '图片最大10M',

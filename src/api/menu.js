@@ -48,12 +48,3 @@ export function getTreeOptions(rmvFile, filename) {
     method: 'get'
   })
 }
-
-export function onsubmit(form) {
-  console.log(form)
-  return request({
-    url: '/uploadimg/onsubmit',
-    method: 'post',
-    data: form
-  })
-}

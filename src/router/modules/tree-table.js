@@ -4,7 +4,9 @@ import Layout from '@/views/layout/Layout'
 
 const treeTableRouter = {
   path: '/tree-table',
-  component: Layout,
+  // component: Layout,
+  // 作为二级嵌套路由指定上 具体组件， Layout与父组件冲突 indexs 是因为 index已经被使用，
+  component: () => import('@/views/tree-table/indexs'),
   redirect: '/table/complex-table',
   name: 'TreeTable',
   meta: {

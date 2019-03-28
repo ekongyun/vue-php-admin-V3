@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input placeholder="名称1" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" size="mini" icon="el-icon-plus" v-perm="['/sys/menu/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/menu/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" v-perm="['/sys/menu/download']" @click="handleDownload">{{ $t('table.export') }}</el-button>
       <el-tag>扩展节点</el-tag>
       <el-switch v-model="defaultExpandAll" active-color="#13ce66" inactive-color="#ff4949" />
@@ -19,8 +19,8 @@
         <el-tag v-else-if="scope.row.type === 2" size="small" type="info">功能</el-tag>
       </template>
       <template slot="operation" slot-scope="{scope}">
-        <el-button size="mini" type="success" v-perm="['/sys/menu/edit']" @click="handleUpdate(scope.row)">编辑</el-button>
-        <el-button size="mini" type="danger" v-perm="['/sys/menu/del']" @click="handleDelete(scope.row)">删除</el-button>
+        <el-button :size="btnsize" type="success" v-perm="['/sys/menu/edit']" @click="handleUpdate(scope.row)">编辑</el-button>
+        <el-button :size="btnsize" type="danger" v-perm="['/sys/menu/del']" @click="handleDelete(scope.row)">删除</el-button>
       </template>
     </tree-table>
 
@@ -71,13 +71,13 @@
       </div>
     </el-dialog>
 
-    <el-alert :closable="false" title="menu 2 测试" /> hello data() 函数 return
+    <!-- <el-alert :closable="false" title="menu 2 测试" /> hello data() 函数 return
     <li>
       路由路径 this.$route.path: {{path}}
     </li>
     <li>
       路由路径参数 this.$route.params: {{params}}
-    </li>
+    </li> -->
   </div>
 </template>
 
@@ -85,8 +85,8 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 import TreeTable from '@/components/TreeTable'
-import data from './data.js'
-import treemenu from './treemenu.js'
+// import data from './data.js'
+// import treemenu from './treemenu.js'
 import { createMenu, updateMenu, deleteMenu, getTreeOptions, getMenuTree } from '@/api/menu'
 
 // import the component
@@ -97,7 +97,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import random from 'string-random'
 
 export default {
-  name: 'snIcvR_sys_menu',
+  name: 'snIc_sys_menu',
   // 所以在编写路由 router 和路由对应的 view component 的时候一定要确保 两者的 name 是完全一致的。
   // register the component Treeselect, TreeTable
   components: { TreeTable, Treeselect },
@@ -111,7 +111,7 @@ export default {
       // 'total': '100',
       path: this.$route.path,
       params: this.$route.params,
-      size: "small",
+      btnsize: "mini",
       listLoading: true,
       listQuery: {
         page: 1,
@@ -267,9 +267,6 @@ export default {
     handleCreate() {
       console.log('handleCreate...click')
       this.resetTemp()
-      for(let i=0;i<9;i++){
-        console.log(random(6, { specials: false, numbers: false, letters: true }))  
-      }
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -280,7 +277,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           // 处理路由别名生成唯一 /sys/menu
-          this.temp.name = random(6, { specials: false, numbers: false, letters: true }) + this.temp.path.replace(/\//g, '_')
+          this.temp.name = random(4, { specials: false, numbers: false, letters: true }) + this.temp.path.replace(/\//g, '_')
           console.log('createData valid done...', this.temp)
 
           // 调用api创建数据入库
@@ -336,10 +333,12 @@ export default {
           // console.log(this.temp)
           // 调用api编辑数据入库
           updateMenu(tempData).then(res => {
-            // 后台重新更新数据
-            this.getData()
-            // this.$refs.TreeTable.updateTreeNode(this.temp) // 只能更新自身以下的节点
-            this.dialogFormVisible = false
+            if (res.type === 'success') {
+              // 后台重新更新数据
+              this.getData()
+              // this.$refs.TreeTable.updateTreeNode(this.temp) // 只能更新自身以下的节点
+              this.dialogFormVisible = false
+            }
             this.$notify({
               //  title: '错误',
               message: res.message,
