@@ -6,7 +6,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/role/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
-    <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%" :default-sort="{prop: 'id', order: 'ascending'}">
+    <el-table v-loading="listLoading" :data="list" highlight-current-row @current-change="handleRoleSelectChange" style="width: 100%" :default-sort="{prop: 'id', order: 'ascending'}">
       <el-table-column prop="id" label="ID" align="center" width="100px" sortable>
       </el-table-column>
       <el-table-column prop="name" label="角色名称" align="center" sortable>
@@ -15,7 +15,7 @@
       </el-table-column>
       <el-table-column class-name="status-col" label="状态" width="100px">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status | statusChange }}</el-tag>
+          <el-tag :type="scope.row.status | statusFilter" size="small">{{ scope.row.status | statusChange }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="listorder" label="排序" align="center" sortable>
@@ -27,26 +27,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <!--角色菜单，表格树内容栏-->
-    <div class="menu-container" :v-if="true">
-      <div class="menu-header">
-        <span>
-          <B>角色授权</B>
-        </span>
-      </div>
-      <!-- <el-tree :data="menuData" size="mini" show-checkbox node-key="id" :props="defaultProps" style="width: 100%;pading-top:20px;" ref="menuTree" :render-content="renderContent" v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true" @check-change="handleMenuCheckChange">
-      </el-tree>
-      <div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
-        <el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null">
-          <b>全选</b>
-        </el-checkbox>
-      </div>
-      <div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-        <kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection" :disabled="this.selectRole.id == null" />
-        <kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading" />
-      </div> -->
-    </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
@@ -71,20 +51,42 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确定</el-button>
       </div>
     </el-dialog>
+
+    <!--角色菜单，表格树内容栏-->
+    <div class="menu-container" :v-if="true">
+      <div class="menu-header">
+        <span>
+          <h2>菜单类授权</h2>
+        </span>
+      </div>
+
+      <el-tree :data="menuData" :props="defaultProps" show-checkbox node-key="id" ref="menuTree" size="mini" style="width: 100%;pading-top:20px;" :render-content="renderContent" v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true" @check-change="handleMenuCheckChange">
+      </el-tree>
+      <div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
+        <el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null">
+          <b>全选</b>
+        </el-checkbox>
+      </div>
+      <div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
+        <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="resetSelection" :disabled="this.selectRole.id == null">重置</el-button>
+        <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading">提交</el-button>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
-import TreeTable from '@/components/TreeTable'
+// import TreeTable from '@/components/TreeTable'
 
-import { createRole, updateRole, deleteRole, getRoleList } from '@/api/role'
+import { createRole, updateRole, deleteRole, getRoleList, getAllMenus, getRoleMenu, saveRolePerms } from '@/api/role'
 
-// import the component
-import Treeselect from '@riophae/vue-treeselect'
-// import the styles
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+// // import the component
+// import Treeselect from '@riophae/vue-treeselect'
+// // import the styles
+// import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 import random from 'string-random'
 
@@ -92,7 +94,7 @@ export default {
   name: 'CkoF_sys_role',
   // 所以在编写路由 router 和路由对应的 view component 的时候一定要确保 两者的 name 是完全一致的。
   // register the component Treeselect, TreeTable
-  components: { TreeTable, Treeselect },
+  components: {},
   directives: { waves, perm },
   filters: {
     statusFilter(status) {
@@ -112,6 +114,25 @@ export default {
   },
   data() {
     return {
+      selectRole: {},
+      menuData: [],
+      menuSelections: [],
+      menuLoading: false,
+      authLoading: false,
+      checkAll: false,
+      currentRoleMenus: [],
+      defaultProps: {
+        children: 'children',
+        label: 'title'
+      },
+      menuLoading: false,
+      tabMapOptions: [
+        { label: '菜单类', key: 'menu' },
+        { label: '角色类', key: 'role' },
+        { label: '文件类', key: 'file' }
+      ],
+      activeName: 'menu',
+      createdTimes: 0,
       // 'href': windows.location.href,
       // path: this.$route.path,
       // params: this.$route.params,
@@ -146,15 +167,117 @@ export default {
     this.fetchData()
   },
   methods: {
+    // 获取数据
     fetchData() {
       this.listLoading = true
+      this.menuLoading = true
       // import { createRole, getRoleList } from '@/api/menu'
       getRoleList().then(res => {
-        console.log('getRoleList', res)
+        // console.log('getRoleList', res)
         this.list = res.data
         this.listLoading = false
       })
 
+      getAllMenus().then(res => {
+        // console.log('getAllMenus', res)
+        this.menuData = res.data
+        this.menuLoading = false
+      })
+    },
+    // 角色选择改变监听
+    handleRoleSelectChange(val) {
+      console.log(val)
+      if (val === null || val.id === null) {
+        return
+      }
+      this.selectRole = val
+      getRoleMenu({ 'roleId': this.selectRole.id }).then((res) => {
+        this.currentRoleMenus = res.data
+        this.$refs.menuTree.setCheckedNodes(res.data)
+      })
+    },
+    // 树节点选择监听
+    handleMenuCheckChange(data, check, subCheck) {
+      if (check) {
+        // 节点选中时同步选中父节点
+        let parentId = data.pid
+        this.$refs.menuTree.setChecked(parentId, true, false)
+      } else {
+        // 节点取消选中时同步取消选中子节点
+        if (data.children != null) {
+          data.children.forEach(element => {
+            this.$refs.menuTree.setChecked(element.id, false, false)
+          });
+        }
+      }
+    },
+    // 重置选择
+    resetSelection() {
+      this.checkAll = false
+      this.$refs.menuTree.setCheckedNodes(this.currentRoleMenus)
+    },
+    // 全选操作
+    handleCheckAll() {
+      if (this.checkAll) {
+        let allMenus = []
+        this.checkAllMenu(this.menuData, allMenus)
+        this.$refs.menuTree.setCheckedNodes(allMenus)
+      } else {
+        this.$refs.menuTree.setCheckedNodes([])
+      }
+    },
+    // 递归全选
+    checkAllMenu(menuData, allMenus) {
+      menuData.forEach(menu => {
+        allMenus.push(menu)
+        if (menu.children) {
+          this.checkAllMenu(menu.children, allMenus)
+        }
+      });
+    },
+    // 角色菜单授权提交
+    submitAuthForm() {
+      let roleId = this.selectRole.id
+      if (roleId == 1) {
+        this.$message({ message: '超级管理员角色拥有所有权限，不允许修改！', type: 'error' })
+        return
+      }
+
+      this.authLoading = true
+      let checkedNodes = this.$refs.menuTree.getCheckedNodes(false, true)
+      let rolePerms = []
+      for (let i = 0, len = checkedNodes.length; i < len; i++) {
+        let rolePerm = { role_id: roleId, perm_id: checkedNodes[i].perm_id }
+        rolePerms.push(rolePerm)
+      }
+
+      // console.log('rolePerms', rolePerms)
+      saveRolePerms(roleId, rolePerms).then((res) => {
+        // console.log('saveRolePerms...', res)
+        this.$notify({
+          //  title: '错误',
+          message: res.message,
+          type: res.type
+        })
+        this.authLoading = false
+      })
+
+
+    },
+    renderContent(h, { node, data, store }) {
+      return (
+        <div class="column-container">
+          <span style="text-algin:center;margin-right:200px;">id:{data.id} - pid:{data.pid} - perm_id: {data.perm_id}</span>
+
+          <span style="text-algin:center;margin-right:200px;">{data.title}</span>
+          <span style="text-algin:center;margin-right:200px;">
+            <el-tag type={data.type === 0 ? '' : data.type === 1 ? 'success' : 'info'} size="small">
+              {data.type === 0 ? '目录' : data.type === 2 ? '功能' : '菜单'}
+            </el-tag>
+          </span>
+          <span style="text-algin:center;margin-right:80px;"> <svg-icon icon-class={data.icon} /> </span>
+          <span style="text-algin:center;margin-right:80px;">{data.path ? data.path : '\t'}</span>
+        </div>)
     },
     resetTemp() {
       this.temp = {

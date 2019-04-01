@@ -9,7 +9,7 @@
       <el-switch v-model="defaultExpandAll" active-color="#13ce66" inactive-color="#ff4949" />
     </div>
 
-    <tree-table ref="TreeTable" :data="tableData" :default-expand-all="defaultExpandAll" :columns="columns" border default-children="children" @selection-change="selectChange">
+    <tree-table ref="TreeTable" :data="tableData" :default-expand-all="defaultExpandAll" :columns="columns" highlight-current-row border default-children="children" @selection-change="selectChange">
       <template slot="icon" slot-scope="{scope}">
         <svg-icon :icon-class="scope.row.icon" />
       </template>

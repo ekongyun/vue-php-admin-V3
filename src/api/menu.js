@@ -41,7 +41,7 @@ export function viewMenuTree(rmvFile, filename) {
   })
 }
 
-// 新建编辑菜单时，下拉选项，配置父节点操作
+// 新建编辑菜单时，下拉选项，配置父节点操作 不需求权限验证
 export function getTreeOptions(rmvFile, filename) {
   return request({
     url: '/sys/menu/treeoptions',
