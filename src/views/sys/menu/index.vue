@@ -273,11 +273,19 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    stringToCamel(str){
+      // var str="border-bottom-color";
+      var temp=str.split("/");
+      for(var i=1;i<temp.length;i++){
+           temp[i]=temp[i][0].toUpperCase()+temp[i].slice(1);
+       }
+        return temp.join("");
+    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           // 处理路由别名生成唯一 /sys/menu
-          this.temp.name = random(4, { specials: false, numbers: false, letters: true }) + this.temp.path.replace(/\//g, '_')
+          this.temp.name = this.stringToCamel(this.temp.path + '/' + random(4, { specials: false, numbers: false, letters: "abcdefghijklmnopqrstuvwxyz" }))
           console.log('createData valid done...', this.temp)
 
           // 调用api创建数据入库
