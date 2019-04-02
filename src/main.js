@@ -26,6 +26,10 @@ Vue.use(Element, {
   i18n: (key, value) => i18n.t(key, value)
 })
 
+// 同时使用 DataTables 和 DataTablesServer
+import VueDataTables from 'vue-data-tables'
+Vue.use(VueDataTables)
+
 // register global utility filters.
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])

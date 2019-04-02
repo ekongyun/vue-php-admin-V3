@@ -43,10 +43,17 @@ export function viewRole(rmvFile, filename) {
   })
 }
 
-// 获取所有菜单 不需权限验证
+// 获取所有菜单类权限 不需权限验证
 export function getAllMenus() {
   return request({
     url: '/sys/role/allmenus',
+    method: 'get'
+  })
+}
+// 获取所有角色类权限 不需权限验证
+export function getAllRoles() {
+  return request({
+    url: '/sys/role/allroles',
     method: 'get'
   })
 }
@@ -55,6 +62,15 @@ export function getAllMenus() {
 export function getRoleMenu(form) {
   return request({
     url: '/sys/role/rolemenu',
+    method: 'post',
+    data: form
+  })
+}
+
+//  获取角色拥有角色权限 不需权限验证
+export function getRoleRole(form) {
+  return request({
+    url: '/sys/role/rolerole',
     method: 'post',
     data: form
   })

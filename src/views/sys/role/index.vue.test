@@ -24,73 +24,24 @@
       </el-table-column>
     </data-tables>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
+    
 
-        <el-form-item label="角色名称" prop="name">
-          <el-input v-model.trim="temp.name" placeholder="请输入角色名" />
-        </el-form-item>
-        <el-form-item label="角色说明" prop="remark">
-          <el-input v-model.trim="temp.remark" placeholder="请输入角色备注" />
-        </el-form-item>
-        <el-form-item label="排序ID">
-          <!-- onkeypress 防止录入e 及其他字符 -->
-          <el-input-number v-model.trim="temp.listorder" controls-position="right" :min="0" onkeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-switch v-model="temp.status" inactive-color="#ff4949" active-value="1" inactive-value="0" />
-        </el-form-item>
+ 
+    <data-tables ref="roleTable" :data="list" :table-props="tableProps" :loading="listLoading" :pagination-props="{ pageSizes: [10,30,100] }">
+      <el-table-column type="selection" width="55">
+      </el-table-column>
 
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确定</el-button>
-      </div>
-    </el-dialog>
+      <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.label">
+      </el-table-column>
+  
+    </data-tables>
 
-    <!--角色菜单，表格树内容栏-->
-    <div class="menu-container" :v-if="true">
-      <div class="menu-header">
-        <span>
-          <h2>角色授权</h2>
-        </span>
-      </div>
-      <el-tabs v-model="activeName" tab-position="top" type="card" @tab-click="handleTabClick" style="height: 200px;">
-        <el-tab-pane label="菜单类" name='menu'>
-          <el-tree :data="menuData" :props="defaultProps" show-checkbox node-key="id" ref="menuTree" size="mini" style="width: 100%;pading-top:20px;" :render-content="renderContent" v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true" @check-change="handleMenuCheckChange">
-          </el-tree>
+    <div style="margin-top: 20px">
+      <el-button @click="toggleSelection(list)">全选</el-button>
+      <el-button @click="toggleSelection([list[1]])">切换第二行的选中状态</el-button>
 
-        </el-tab-pane>
-        <el-tab-pane label="角色类" name='role'>
-          <data-tables ref="roleTable" :data="roleData" :table-props="tableProps" :loading="roleLoading" :pagination-props="{ pageSizes: [10,30,100] }">
-            <el-table-column type="selection" width="55">
-            </el-table-column>
-
-            <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom">
-            </el-table-column>
-
-            <el-table-column label="状态" min-width="100px">
-              <template slot-scope="scope">
-                <el-tag :type="scope.row.status | statusFilter" size="small">{{ scope.row.status | statusChange }}</el-tag>
-              </template>
-            </el-table-column>
-          </data-tables>
-        </el-tab-pane>
-
-        <el-tab-pane label="文件类" name='file'>todo:文件类授权</el-tab-pane>
-
-        <div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
-          <el-checkbox v-model="checkAll" @change="handleCheckAll" v-if="activeName==='menu'" :disabled="this.selectRole.id == null">
-            <b>全选</b>
-          </el-checkbox>
-        </div>
-        <div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-          <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="resetSelection" :disabled="this.selectRole.id == null">重置</el-button>
-          <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading">提交</el-button>
-        </div>
-      </el-tabs>
+      <el-button @click="toggleSelection()">取消选择</el-button>
     </div>
-
   </div>
 </template>
 
@@ -98,7 +49,7 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 
-import { createRole, updateRole, deleteRole, getRoleList, getAllMenus, getAllRoles, getRoleMenu, getRoleRole, saveRolePerms } from '@/api/role'
+import { createRole, updateRole, deleteRole, getRoleList, getAllMenus, getRoleMenu, getRoleRole, saveRolePerms } from '@/api/role'
 
 import random from 'string-random'
 
@@ -156,10 +107,10 @@ export default {
         },
       ],
       rtitles: [
-        // {
-        //   prop: 'perm_id',
-        //   label: '权限ID'
-        // },
+        {
+          prop: 'perm_id',
+          label: '权限ID'
+        },
         {
           prop: 'id',
           label: 'ID'
@@ -189,13 +140,12 @@ export default {
       },
       selectRole: {},
       menuData: [],
+      menuSelections: [],
       menuLoading: false,
-      roleData: [],
-      roleLoading: false,
       authLoading: false,
       checkAll: false,
-      currentRoleMenus: [], // 服务端获取当前角色的菜单类权限
-      currentRoleRoles: [], // 服务端获取当前角色的角色类权限
+      currentRoleMenus: [],
+      currentRoleRoles: [],
       defaultProps: {
         children: 'children',
         label: 'title'
@@ -235,11 +185,16 @@ export default {
     this.fetchData()
   },
   methods: {
+
+    handleSelectionChange(val) {
+      // this.selectedRow = val
+      console.log('handleSelectionChange', val)
+    },
+
     // 获取数据
     fetchData() {
       this.listLoading = true
       this.menuLoading = true
-      this.roleLoading = true
       // import { createRole, getRoleList } from '@/api/menu'
       getRoleList().then(res => {
         console.log('getRoleList', res)
@@ -248,20 +203,24 @@ export default {
         this.listLoading = false
       })
 
-      // 菜单类权限列表
       getAllMenus().then(res => {
         // console.log('getAllMenus', res)
         this.menuData = res.data
         this.menuLoading = false
       })
-      // 角色类权限列表
-      getAllRoles().then(res => {
-        this.roleData = res.data.items
-        this.roleLoading = false
-      })
     },
     handleTabClick(tab, event) {
-      // console.log(tab, event);
+      console.log(tab, event);
+    },
+    toggleSelection(rows) {
+      console.log(rows)
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.roleTable.$refs.elTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.roleTable.$refs.elTable.clearSelection();
+      }
     },
     // 角色选择改变监听
     handleRoleSelectChange(val) {
@@ -270,22 +229,13 @@ export default {
         return
       }
       this.selectRole = val
-      getRoleMenu({ 'roleId': this.selectRole.id }).then((res) => {
-        this.currentRoleMenus = res.data
-        this.$refs.menuTree.setCheckedNodes(res.data)
-      })
+ 
 
-      getRoleRole({ 'roleId': this.selectRole.id }).then((res) => {
+      getRoleRole({ 'roleId': 1}).then((res) => {
+ 
         this.currentRoleRoles = res.data
         console.log('currentRoleRoles', this.currentRoleRoles)
-        this.$refs.roleTable.$refs.elTable.clearSelection();
-        for (let i = 0; i < this.currentRoleRoles.length; i++) {
-          for (let index = 0; index < this.roleData.length; index++) {
-            if (this.currentRoleRoles[i].perm_id == this.roleData[index].perm_id) { //服务端返回需选中项的id           
-              this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true); //row.ndex 选中
-            }
-          }
-        }
+        this.toggleSelection(this.list)
       })
     },
     // 树节点选择监听
@@ -306,17 +256,11 @@ export default {
     // 重置选择
     resetSelection() {
       this.checkAll = false
-      // 重置当前菜单类权限
-      this.$refs.menuTree.setCheckedNodes(this.currentRoleMenus)
-      // 重置当前角色类权限 先清空赋值
-      this.$refs.roleTable.$refs.elTable.clearSelection();
-      for (let i = 0; i < this.currentRoleRoles.length; i++) {
-        for (let index = 0; index < this.roleData.length; index++) {
-          if (this.currentRoleRoles[i].perm_id == this.roleData[index].perm_id) {
-            this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true);
-          }
-        }
-      }
+      this.$refs.menuTree.setCheckedNodes(this.currentRoleMenus) // 重置当前菜单类权限
+      // this.$refs.roleTable.$refs.elTable.clearSelection() // 重置当前角色类权限
+      this.currentRoleRoles.forEach(row => {
+        this.$refs.roleTable.$refs.elTable.toggleRowSelection(row);
+      });
     },
     // 全选操作
     handleCheckAll() {
@@ -346,23 +290,14 @@ export default {
       }
 
       this.authLoading = true
-      let rolePerms = []
-      // 获取选中的菜单类权限
       let checkedNodes = this.$refs.menuTree.getCheckedNodes(false, true)
+      let rolePerms = []
       for (let i = 0, len = checkedNodes.length; i < len; i++) {
         let rolePerm = { role_id: roleId, perm_id: checkedNodes[i].perm_id }
         rolePerms.push(rolePerm)
       }
-      // 获取选中的角色类权限
-      // 在使用Element前端库时候,需要获得表格选中行的时候 查看源码,发现有个store属性,保存了选中的行数据.
-      let roleSelections = this.$refs.roleTable.$refs.elTable.store.states.selection
-      for (let i = 0, len = roleSelections.length; i < len; i++) {
-        let rolePerm = { role_id: roleId, perm_id: roleSelections[i].perm_id }
-        rolePerms.push(rolePerm)
-      }
 
       // console.log('rolePerms', rolePerms)
-      // return
       saveRolePerms(roleId, rolePerms).then((res) => {
         // console.log('saveRolePerms...', res)
         this.$notify({
@@ -372,6 +307,8 @@ export default {
         })
         this.authLoading = false
       })
+
+
     },
     renderContent(h, { node, data, store }) {
       return (
@@ -384,8 +321,8 @@ export default {
           </span>
           <span style="text-algin:center;margin-right:80px;"> <svg-icon icon-class={data.icon} /> </span>
           <span style="text-algin:center;margin-right:80px;">{data.path ? data.path : '\t'}</span>
+          <span style="text-algin:center;margin-right:200px;">id:{data.id} - pid:{data.pid} - perm_id: {data.perm_id}</span>
         </div>)
-      // <span style="text-algin:center;margin-right:200px;">id:{data.id} - pid:{data.pid} - perm_id: {data.perm_id}</span>
     },
     resetTemp() {
       this.temp = {

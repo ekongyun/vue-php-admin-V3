@@ -138,6 +138,12 @@ export const constantRouterMap = [
         meta: { title: 'icons', icon: 'icon', noCache: true }
       },
       {
+        path: '/examplex/vuetables',
+        component: () => import('@/views/vue-data-tables/index'),
+        name: 'vue-data-tables',
+        meta: { title: 'vue-data-tables', icon: 'icon', noCache: true }
+      },
+      {
         path: '/examplex/permission',
         name: 'Permission',
         // 嵌套路由必须在路由指定具体 component, 因为路由指定上了Layout 会冲突 参考@/views/nests/index.vue
