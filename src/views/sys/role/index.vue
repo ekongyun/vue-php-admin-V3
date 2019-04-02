@@ -1,13 +1,20 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input placeholder="名称" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input placeholder="角色名" style="width: 200px;" class="filter-item" v-model="filters[0].value"></el-input>
+      <el-select class="filter-item" v-model="filters[1].value" multiple="multiple">
+        <el-option label="启用" value="1"></el-option>
+        <el-option label="禁用" value="0"></el-option>
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/role/view']" @click="handleFilter">查询</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/role/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
+
+      <!-- <el-input placeholder="名称" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/role/view']" @click="handleFilter">查询</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/role/add']" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
     </div>
 
-    <!-- @query-change="loadData" -->
-    <data-tables :data="list" :table-props="tableProps" :loading="listLoading" @current-change="handleRoleSelectChange" :pagination-props="{ pageSizes: [5, 10, 15,20] }">
+    <data-tables :data="list" :filters="filters" layout="table,pagination" :table-props="tableProps" :loading="listLoading" @current-change="handleRoleSelectChange" :pagination-props="{ pageSizes: [5, 10, 15,20] }">
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom">
       </el-table-column>
 
@@ -62,7 +69,7 @@
 
         </el-tab-pane>
         <el-tab-pane label="角色类" name='role'>
-          <data-tables ref="roleTable" :data="roleData" :table-props="tableProps" :loading="roleLoading" :pagination-props="{ pageSizes: [10,30,100] }">
+          <data-tables ref="roleTable" :data="roleData" :table-props="tableProps" :loading="roleLoading" :pagination-props="{ pageSizes: [10,20] }">
             <el-table-column type="selection" width="55">
             </el-table-column>
 
@@ -126,6 +133,13 @@ export default {
   },
   data() {
     return {
+      filters: [{
+        prop: 'name',
+        value: ''
+      }, {
+        prop: 'status',
+        value: '',
+      }],
       list: [],
       total: 0,
       listLoading: true,
@@ -240,9 +254,8 @@ export default {
       this.listLoading = true
       this.menuLoading = true
       this.roleLoading = true
-      // import { createRole, getRoleList } from '@/api/menu'
       getRoleList().then(res => {
-        console.log('getRoleList', res)
+        // console.log('getRoleList', res)
         this.list = res.data.items
         this.total = res.data.total
         this.listLoading = false
