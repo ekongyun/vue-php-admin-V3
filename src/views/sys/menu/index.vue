@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input placeholder="名称1" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="search" placeholder="输入菜单名搜索" style="width: 200px;" class="filter-item" />
       <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/menu/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" v-perm="['/sys/menu/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" v-perm="['/sys/menu/download']" @click="handleDownload">{{ $t('table.export') }}</el-button>
-      <el-tag>扩展节点</el-tag>
+      <el-tag size="small">扩展节点</el-tag>
       <el-switch v-model="defaultExpandAll" active-color="#13ce66" inactive-color="#ff4949" />
     </div>
 
-    <tree-table ref="TreeTable" :data="tableData" :default-expand-all="defaultExpandAll" :columns="columns" highlight-current-row border default-children="children" @selection-change="selectChange">
+    <tree-table ref="TreeTable" :data="tableData.filter(data => !search || data.children?deepFilter(data.children):data.title.toLowerCase().includes(search.toLowerCase()))" :default-expand-all="defaultExpandAll" :columns="columns" highlight-current-row stripe default-children="children" @selection-change="selectChange">
       <template slot="icon" slot-scope="{scope}">
         <svg-icon :icon-class="scope.row.icon" />
       </template>
@@ -44,7 +44,7 @@
           <el-input v-model.trim="temp.name" placeholder="@view component name 必须与该路由别名一致" />
         </el-form-item>
         <el-form-item v-if="temp.type === 1" label="组件" prop="component">
-          <el-input v-model.trim="temp.component" placeholder="@/views/目录下相对组件路径,  例 sys/menu/index" />
+          <el-input v-model.trim="temp.component" placeholder="对应 @/views 目录, 例 sys/menu/index" />
         </el-form-item>
         <el-form-item v-if="temp.type !== 2" label="重定向URL">
           <el-input v-model.trim="temp.redirect" placeholder="面包屑组件重定向,例 /sys/menu, 可留空" />
@@ -103,7 +103,9 @@ export default {
   components: { TreeTable, Treeselect },
   directives: { waves, perm },
   filters: {
-
+    deepFilter(item) {
+      return item.children
+    },
   },
   data() {
     return {
@@ -111,6 +113,7 @@ export default {
       // 'total': '100',
       path: this.$route.path,
       params: this.$route.params,
+      search: '',
       btnsize: "mini",
       listLoading: true,
       listQuery: {
@@ -273,13 +276,13 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    stringToCamel(str){
+    stringToCamel(str) {
       // var str="border-bottom-color";
-      var temp=str.split("/");
-      for(var i=1;i<temp.length;i++){
-           temp[i]=temp[i][0].toUpperCase()+temp[i].slice(1);
-       }
-        return temp.join("");
+      var temp = str.split("/");
+      for (var i = 1; i < temp.length; i++) {
+        temp[i] = temp[i][0].toUpperCase() + temp[i].slice(1);
+      }
+      return temp.join("");
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
