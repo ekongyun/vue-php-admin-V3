@@ -9,24 +9,19 @@
         </el-col>
 
         <el-col :span="4">
-          <el-input placeholder="search NO." v-model="filters[0].value"></el-input>
+          <el-input v-model="filters[0].value" placeholder="search NO." />
         </el-col>
       </el-row>
     </div>
 
     <data-tables :data="data" :action-col="actionCol" :filters="filters" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-
-      <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.prop" sortable="custom">
-      </el-table-column>
+      <el-table-column type="selection" width="55" />
+      <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.prop" sortable="custom" />
     </data-tables>
 
     <data-tables ref="multipleTable" :data="tableData" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-      <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.prop" sortable="custom">
-      </el-table-column>
+      <el-table-column type="selection" width="55" />
+      <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.prop" sortable="custom" />
     </data-tables>
     <div style="margin-top: 20px">
       <el-button @click="toggleSelection(tableData)">全选</el-button>
@@ -47,7 +42,7 @@
       # npm install vue-data-tables main.js 里 _在引入 element-ui 后面 引入_ // 同时使用 DataTables 和 DataTablesServer import VueDataTables from 'vue-data-tables' Vue.use(VueDataTables)
     </el-alert>
     <el-tag>
-      引用方法时 使用双层$refs 来引用el-table的方法：   this.$refs.multipleTable.$refs.elTable.toggleRowSelection(row);
+      引用方法时 使用双层$refs 来引用el-table的方法： this.$refs.multipleTable.$refs.elTable.toggleRowSelection(row);
     </el-tag>
   </div>
 </template>
@@ -69,7 +64,7 @@ export default {
         {
           prop: 'flow_type',
           label: '类型'
-        },
+        }
       ],
       rtitles: [
         {
@@ -83,7 +78,7 @@ export default {
         {
           prop: 'address',
           label: 'address'
-        },
+        }
       ],
       filters: [{
         prop: 'flow_no',
@@ -91,7 +86,7 @@ export default {
       }],
       actionCol: {
         props: {
-          label: '操作',
+          label: '操作'
         },
         buttons: [{
           props: {
@@ -150,10 +145,10 @@ export default {
       console.log('rows', rows)
       if (rows) {
         rows.forEach(row => {
-          this.$refs.multipleTable.$refs.elTable.toggleRowSelection(row);
-        });
+          this.$refs.multipleTable.$refs.elTable.toggleRowSelection(row)
+        })
       } else {
-        this.$refs.multipleTable.$refs.elTable.clearSelection();
+        this.$refs.multipleTable.$refs.elTable.clearSelection()
       }
     },
     handleSelectionChange(val) {
@@ -161,10 +156,10 @@ export default {
     },
     onCreate() {
       this.data.push({
-        content: "new created",
-        flow_no: "FW201601010003" + Math.floor(Math.random() * 100),
-        flow_type: "Help",
-        flow_type_code: "help"
+        content: 'new created',
+        flow_no: 'FW201601010003' + Math.floor(Math.random() * 100),
+        flow_type: 'Help',
+        flow_type_code: 'help'
       })
     },
     onCreate100() {

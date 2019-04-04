@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
-// 操作：列出菜单  
+// 操作：列出菜单
 export function getRoleList(form) {
   return request({
-    url: '/sys/role/info',
-    method: 'get'
+    url: '/sys/role/view',
+    method: 'post',
+    data: form
   })
 }
 
@@ -35,13 +36,13 @@ export function deleteRole(form) {
   })
 }
 
-// 查询按钮
-export function viewRole(rmvFile, filename) {
-  return request({
-    url: '/sys/role/view',
-    method: 'get'
-  })
-}
+// // 查询按钮
+// export function viewRole(rmvFile, filename) {
+//   return request({
+//     url: '/sys/role/view',
+//     method: 'get'
+//   })
+// }
 
 // 获取所有菜单类权限 不需权限验证
 export function getAllMenus() {
@@ -83,6 +84,4 @@ export function saveRolePerms(roleId, rolePerms) {
     data: { roleId, rolePerms }
   })
 }
-
-
 

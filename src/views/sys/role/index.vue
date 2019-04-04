@@ -1,22 +1,21 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input placeholder="角色名" style="width: 200px;" class="filter-item" v-model="filters[0].value"></el-input>
-      <el-select class="filter-item" v-model="filters[1].value" multiple="multiple">
-        <el-option label="启用" value="1"></el-option>
-        <el-option label="禁用" value="0"></el-option>
+      <el-input v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
+      <el-select v-model="filters[1].value" class="filter-item" multiple="multiple">
+        <el-option label="启用" value="1" />
+        <el-option label="禁用" value="0" />
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/role/view']" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/role/add']" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-waves v-perm="['/sys/role/view']" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button v-perm="['/sys/role/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('table.add') }}</el-button>
 
       <!-- <el-input placeholder="名称" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/role/view']" @click="handleFilter">查询</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" :size="btnsize" icon="el-icon-plus" v-perm="['/sys/role/add']" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
     </div>
 
-    <data-tables :data="list" :filters="filters" layout="table,pagination" :table-props="tableProps" :loading="listLoading" @current-change="handleRoleSelectChange" :pagination-props="{ pageSizes: [5, 10, 15,20] }">
-      <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom">
-      </el-table-column>
+    <data-tables :data="list" :filters="filters" :loading="listLoading" :table-props="tableProps" :pagination-props="{ pageSizes: [5, 10, 15,20] }" layout="table,pagination" @current-change="handleRoleSelectChange">
+      <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
 
       <el-table-column label="状态" min-width="100px">
         <template slot-scope="scope">
@@ -25,8 +24,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="100px">
         <template slot-scope="scope">
-          <el-button :size="btnsize" type="success" v-perm="['/sys/role/edit']" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button :size="btnsize" type="danger" v-perm="['/sys/role/del']" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-perm="['/sys/role/edit']" :size="btnsize" type="success" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-perm="['/sys/role/edit']" :size="btnsize" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </data-tables>
@@ -42,7 +41,7 @@
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
-          <el-input-number v-model.trim="temp.listorder" controls-position="right" :min="0" onkeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" />
+          <el-input-number v-model.trim="temp.listorder" :min="0" controls-position="right" onkeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch v-model="temp.status" inactive-color="#ff4949" active-value="1" inactive-value="0" />
@@ -56,26 +55,32 @@
     </el-dialog>
 
     <!--角色菜单，表格树内容栏-->
-    <div class="menu-container" :v-if="true">
+    <div class="menu-container">
       <div class="menu-header">
         <span>
           <h2>角色授权</h2>
         </span>
       </div>
-      <el-tabs v-model="activeName" tab-position="top" type="card" @tab-click="handleTabClick" style="height: 200px;">
-        <el-tab-pane label="菜单类" name='menu'>
-          <el-tree :data="menuData" :props="defaultProps" show-checkbox node-key="id" ref="menuTree" size="mini" style="width: 100%;pading-top:20px;" :render-content="renderContent" v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true" @check-change="handleMenuCheckChange">
-          </el-tree>
-
+      <el-tabs v-model="activeName" tab-position="top" type="card" style="height: 200px;" @tab-click="handleTabClick">
+        <el-tab-pane label="菜单类" name="menu">
+          <el-tree
+            v-loading="menuLoading"
+            ref="menuTree"
+            :data="menuData"
+            :props="defaultProps"
+            :render-content="renderContent"
+            :check-strictly="true"
+            show-checkbox
+            node-key="id"
+            size="mini"
+            style="width: 100%;pading-top:20px;"
+            element-loading-text="拼命加载中"
+            @check-change="handleMenuCheckChange" />
         </el-tab-pane>
-        <el-tab-pane label="角色类" name='role'>
+        <el-tab-pane label="角色类" name="role">
           <data-tables ref="roleTable" :data="roleData" :table-props="tableProps" :loading="roleLoading" :pagination-props="{ pageSizes: [10,20] }">
-            <el-table-column type="selection" width="55">
-            </el-table-column>
-
-            <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom">
-            </el-table-column>
-
+            <el-table-column type="selection" width="55" />
+            <el-table-column v-for="title in rtitles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
             <el-table-column label="状态" min-width="100px">
               <template slot-scope="scope">
                 <el-tag :type="scope.row.status | statusFilter" size="small">{{ scope.row.status | statusChange }}</el-tag>
@@ -84,16 +89,16 @@
           </data-tables>
         </el-tab-pane>
 
-        <el-tab-pane label="文件类" name='file'>todo:文件类授权</el-tab-pane>
+        <el-tab-pane label="文件类" name="file">todo:文件类授权</el-tab-pane>
 
         <div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
-          <el-checkbox v-model="checkAll" @change="handleCheckAll" v-if="activeName==='menu'" :disabled="this.selectRole.id == null">
+          <el-checkbox v-if="activeName==='menu'" v-model="checkAll" :disabled="selectRole.id == null" @change="handleCheckAll">
             <b>全选</b>
           </el-checkbox>
         </div>
         <div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-          <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="resetSelection" :disabled="this.selectRole.id == null">重置</el-button>
-          <el-button v-waves type="primary" :size="btnsize" v-perm="['/sys/role/edit']" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading">提交</el-button>
+          <el-button v-perm="['/sys/role/edit']" v-waves :disabled="selectRole.id == null" :size="btnsize" type="primary" @click="resetSelection">重置</el-button>
+          <el-button v-perm="['/sys/role/edit']" v-waves :loading="authLoading" :disabled="selectRole.id == null" :size="btnsize" type="primary" @click="submitAuthForm">提交</el-button>
         </div>
       </el-tabs>
     </div>
@@ -107,7 +112,7 @@ import perm from '@/directive/perm/index.js' // 权限判断指令
 
 import { createRole, updateRole, deleteRole, getRoleList, getAllMenus, getAllRoles, getRoleMenu, getRoleRole, saveRolePerms } from '@/api/role'
 
-import random from 'string-random'
+// import random from 'string-random'
 
 export default {
   name: 'SysRoleCkoF',
@@ -138,7 +143,7 @@ export default {
         value: ''
       }, {
         prop: 'status',
-        value: '',
+        value: ''
       }],
       list: [],
       total: 0,
@@ -167,7 +172,7 @@ export default {
         {
           prop: 'listorder',
           label: '排序'
-        },
+        }
       ],
       rtitles: [
         // {
@@ -190,7 +195,7 @@ export default {
         {
           prop: 'listorder',
           label: '排序'
-        },
+        }
       ],
       tableProps: {
         border: false,
@@ -214,7 +219,6 @@ export default {
         children: 'children',
         label: 'title'
       },
-      menuLoading: false,
       tabMapOptions: [
         { label: '菜单类', key: 'menu' },
         { label: '角色类', key: 'role' },
@@ -225,7 +229,7 @@ export default {
       // 'href': windows.location.href,
       // path: this.$route.path,
       // params: this.$route.params,
-      btnsize: "mini",
+      btnsize: 'mini',
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -241,7 +245,7 @@ export default {
       },
       rules: {
         name: [{ required: true, message: '请输入角色名', trigger: 'blur' }]
-      },
+      }
     }
   },
 
@@ -291,11 +295,11 @@ export default {
       getRoleRole({ 'roleId': this.selectRole.id }).then((res) => {
         this.currentRoleRoles = res.data
         console.log('currentRoleRoles', this.currentRoleRoles)
-        this.$refs.roleTable.$refs.elTable.clearSelection();
+        this.$refs.roleTable.$refs.elTable.clearSelection()
         for (let i = 0; i < this.currentRoleRoles.length; i++) {
           for (let index = 0; index < this.roleData.length; index++) {
-            if (this.currentRoleRoles[i].perm_id == this.roleData[index].perm_id) { //服务端返回需选中项的id           
-              this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true); //row.ndex 选中
+            if (this.currentRoleRoles[i].perm_id === this.roleData[index].perm_id) { // 服务端返回需选中项的id
+              this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true) // row.ndex 选中
             }
           }
         }
@@ -305,14 +309,14 @@ export default {
     handleMenuCheckChange(data, check, subCheck) {
       if (check) {
         // 节点选中时同步选中父节点
-        let parentId = data.pid
+        const parentId = data.pid
         this.$refs.menuTree.setChecked(parentId, true, false)
       } else {
         // 节点取消选中时同步取消选中子节点
         if (data.children != null) {
           data.children.forEach(element => {
             this.$refs.menuTree.setChecked(element.id, false, false)
-          });
+          })
         }
       }
     },
@@ -322,11 +326,11 @@ export default {
       // 重置当前菜单类权限
       this.$refs.menuTree.setCheckedNodes(this.currentRoleMenus)
       // 重置当前角色类权限 先清空赋值
-      this.$refs.roleTable.$refs.elTable.clearSelection();
+      this.$refs.roleTable.$refs.elTable.clearSelection()
       for (let i = 0; i < this.currentRoleRoles.length; i++) {
         for (let index = 0; index < this.roleData.length; index++) {
-          if (this.currentRoleRoles[i].perm_id == this.roleData[index].perm_id) {
-            this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true);
+          if (this.currentRoleRoles[i].perm_id === this.roleData[index].perm_id) {
+            this.$refs.roleTable.$refs.elTable.toggleRowSelection(this.roleData[index], true)
           }
         }
       }
@@ -334,7 +338,7 @@ export default {
     // 全选操作
     handleCheckAll() {
       if (this.checkAll) {
-        let allMenus = []
+        const allMenus = []
         this.checkAllMenu(this.menuData, allMenus)
         this.$refs.menuTree.setCheckedNodes(allMenus)
       } else {
@@ -348,29 +352,29 @@ export default {
         if (menu.children) {
           this.checkAllMenu(menu.children, allMenus)
         }
-      });
+      })
     },
     // 角色菜单授权提交
     submitAuthForm() {
-      let roleId = this.selectRole.id
-      if (roleId == 1) {
+      const roleId = this.selectRole.id
+      if (roleId === 1) {
         this.$message({ message: '超级管理员角色拥有所有权限，不允许修改！', type: 'error' })
         return
       }
 
       this.authLoading = true
-      let rolePerms = []
+      const rolePerms = []
       // 获取选中的菜单类权限
-      let checkedNodes = this.$refs.menuTree.getCheckedNodes(false, true)
+      const checkedNodes = this.$refs.menuTree.getCheckedNodes(false, true)
       for (let i = 0, len = checkedNodes.length; i < len; i++) {
-        let rolePerm = { role_id: roleId, perm_id: checkedNodes[i].perm_id }
+        const rolePerm = { role_id: roleId, perm_id: checkedNodes[i].perm_id }
         rolePerms.push(rolePerm)
       }
       // 获取选中的角色类权限
       // 在使用Element前端库时候,需要获得表格选中行的时候 查看源码,发现有个store属性,保存了选中的行数据.
-      let roleSelections = this.$refs.roleTable.$refs.elTable.store.states.selection
+      const roleSelections = this.$refs.roleTable.$refs.elTable.store.states.selection
       for (let i = 0, len = roleSelections.length; i < len; i++) {
-        let rolePerm = { role_id: roleId, perm_id: roleSelections[i].perm_id }
+        const rolePerm = { role_id: roleId, perm_id: roleSelections[i].perm_id }
         rolePerms.push(rolePerm)
       }
 
@@ -388,17 +392,17 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       return (
-        <div class="column-container">
-          <span style="text-algin:center;margin-right:200px;">{data.title}</span>
-          <span style="text-algin:center;margin-right:200px;">
-            <el-tag type={data.type === 0 ? '' : data.type === 1 ? 'success' : 'info'} size="small">
+        <div class='column-container'>
+          <span style='text-algin:center;margin-right:200px;'>{data.title}</span>
+          <span style='text-algin:center;margin-right:200px;'>
+            <el-tag type={data.type === 0 ? '' : data.type === 1 ? 'success' : 'info'} size='small'>
               {data.type === 0 ? '目录' : data.type === 2 ? '功能' : '菜单'}
             </el-tag>
           </span>
-          <span style="text-algin:center;margin-right:80px;"> <svg-icon icon-class={data.icon} /> </span>
-          <span style="text-algin:center;margin-right:80px;">{data.path ? data.path : '\t'}</span>
+          <span style='text-algin:center;margin-right:80px;'> <svg-icon icon-class={data.icon} /> </span>
+          <span style='text-algin:center;margin-right:80px;'>{data.path ? data.path : '\t'}</span>
         </div>)
-      // <span style="text-algin:center;margin-right:200px;">id:{data.id} - pid:{data.pid} - perm_id: {data.perm_id}</span>
+      // <span style='text-algin:center;margin-right:200px;'>id:{data.id} - pid:{data.pid} - perm_id: {data.perm_id}</span>
     },
     resetTemp() {
       this.temp = {
@@ -466,8 +470,8 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$confirm("确认删除选中记录吗？[角色: " + row.name + "]", "提示", {
-        type: "warning"
+      this.$confirm('确认删除选中记录吗？[角色: ' + row.name + ']', '提示', {
+        type: 'warning'
       }).then(() => {
         const tempData = {
           'id': row.id,
@@ -492,7 +496,6 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       // this.getList()
-
     }
   }
 }

@@ -1,7 +1,259 @@
-<template >
-  <div style="padding:30px;">
-    <el-alert :closable="false" title="menu 1">
-      <router-view />
-    </el-alert>
+<template>
+  <div class="app-container">
+    <div class="filter-container">
+      <el-input v-perm="['/sys/user/view']" v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
+      <el-select v-perm="['/sys/user/view']" v-model="filters[1].value" class="filter-item" multiple="multiple">
+        <el-option label="启用" value="1"/>
+        <el-option label="禁用" value="0"/>
+      </el-select>
+
+      <el-button v-perm="['/sys/user/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
+
+    </div>
+
+    <data-tables-server :data="list" :filters="filters" :table-props="tableProps" :loading="listLoading" :pagination-props="{ pageSizes: [20, 50, 100] }" layout="table,pagination">
+      <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
+      <el-table-column label="状态" min-width="100px">
+        <template slot-scope="scope"/>
+      </el-table-column>
+      <el-table-column label="操作" align="center" min-width="100px">
+        <template slot-scope="scope">
+          <el-button v-perm="['/sys/user/edit']" :size="btnsize" type="success" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-perm="['/sys/user/del']" :size="btnsize" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </data-tables-server>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
+
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model.trim="temp.name" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model.trim="temp.remark" placeholder="请输入email" />
+        </el-form-item>
+        <el-form-item label="排序ID">
+          <!-- onkeypress 防止录入e 及其他字符 -->
+          <el-input-number v-model.trim="temp.listorder" :min="0" controls-position="right" onkeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-switch v-model="temp.status" inactive-color="#ff4949" active-value="1" inactive-value="0" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
+
+<script>
+import waves from '@/directive/waves' // Waves directive
+import perm from '@/directive/perm/index.js' // 权限判断指令
+
+import { createUser, updateUser, deleteUser, getUserList } from '@/api/user'
+
+// import random from 'string-random'
+
+export default {
+  name: 'SysUserPhjc',
+  // 所以在编写路由 router 和路由对应的 view component 的时候一定要确保 两者的 name 是完全一致的。
+  // register the component Treeselect, TreeTable
+  components: {},
+  directives: { waves, perm },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        1: 'success',
+        0: 'danger'
+      }
+      return statusMap[status]
+    },
+    statusChange(status) {
+      const statusMapx = {
+        1: '启用',
+        0: '禁用'
+      }
+      return statusMapx[status]
+    }
+  },
+  data() {
+    return {
+      filters: [{
+        prop: 'username',
+        value: ''
+      }, {
+        prop: 'status',
+        value: ''
+      }],
+      list: [],
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 10
+      },
+      titles: [
+        {
+          prop: 'id',
+          label: 'ID'
+        },
+        {
+          prop: 'username',
+          label: '用户名'
+        },
+        {
+          prop: 'email',
+          label: 'Email'
+        },
+        {
+          prop: 'listorder',
+          label: '排序'
+        }
+      ],
+      tableProps: {
+        border: false,
+        stripe: true,
+        highlightCurrentRow: true,
+        defaultSort: {
+          prop: 'listorder',
+          order: 'ascending'
+        }
+      },
+
+      btnsize: 'mini',
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '新增'
+      },
+      temp: {
+        id: undefined,
+        name: '',
+        remark: '',
+        status: '1',
+        listorder: 99
+      },
+      rules: {
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
+      }
+    }
+  },
+
+  created() {
+    this.fetchData()
+  },
+  methods: {
+    // 获取数据
+    fetchData() {
+      this.listLoading = true
+
+      getUserList().then(res => {
+        console.log('getUserList', res)
+        this.list = res.data.items
+        this.total = res.data.total
+        this.listLoading = false
+      })
+    },
+
+    resetTemp() {
+      this.temp = {
+        id: undefined,
+        name: '',
+        remark: '',
+        status: '1',
+        listorder: 99
+      }
+    },
+    handleCreate() {
+      console.log('handleCreate...click')
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          console.log('createData valid done...', this.temp)
+
+          // 调用api创建数据入库
+          createUser(this.temp).then(res => {
+            // 成功后 关闭窗口
+            console.log('createUser...', res)
+            this.fetchData()
+            this.dialogFormVisible = false
+            this.$notify({
+              message: res.message,
+              type: res.type
+            })
+          })
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.temp = Object.assign({}, row) // copy obj
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          // 调用api编辑数据入库
+          updateUser(this.temp).then(res => {
+            if (res.type === 'success') {
+              // 后台重新更新数据
+              this.fetchData()
+              // this.$refs.TreeTable.updateTreeNode(this.temp) // 只能更新自身以下的节点
+              this.dialogFormVisible = false
+            }
+            this.$notify({
+              //  title: '错误',
+              message: res.message,
+              type: res.type
+            })
+          })
+        }
+      })
+    },
+    handleDelete(row) {
+      this.$confirm('确认删除选中记录吗？[用户: ' + row.username + ']', '提示', {
+        type: 'warning'
+      }).then(() => {
+        const tempData = {
+          'id': row.id,
+          'name': row.username
+        }
+
+        // 调用api删除数据
+        deleteUser(tempData).then(res => {
+          // 如果删除成功，后台重新更新数据,否则不更新数据
+          if (res.type === 'success') {
+            this.fetchData()
+          }
+          this.dialogFormVisible = false
+          this.$notify({
+            //  title: '错误',
+            message: res.message,
+            type: res.type
+          })
+        })
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      // this.getList()
+    }
+  }
+}
+</script>

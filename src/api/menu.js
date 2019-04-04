@@ -3,8 +3,9 @@ import request from '@/utils/request'
 // 操作：列出菜单 TableData
 export function getMenuTree(form) {
   return request({
-    url: '/sys/menu/info',
-    method: 'get'
+    url: '/sys/menu/view',
+    method: 'post',
+    data: form
   })
 }
 
