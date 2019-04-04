@@ -382,10 +382,7 @@ export const constantRouterMap = [
         ]
       }
     ]
-  },
-
-
-
+  }
   // 只有一个孩子的时候 则alwaysShow: true
   // {
   //   path: '/permission',

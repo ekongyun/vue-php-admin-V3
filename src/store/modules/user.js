@@ -14,7 +14,7 @@ const user = {
     setting: {
       articlePlatform: []
     },
-    ctrlperm:''
+    ctrlperm: ''
   },
 
   mutations: {

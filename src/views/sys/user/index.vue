@@ -3,8 +3,8 @@
     <div class="filter-container">
       <el-input v-perm="['/sys/user/view']" v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
       <el-select v-perm="['/sys/user/view']" v-model="filters[1].value" class="filter-item" multiple="multiple">
-        <el-option label="启用" value="1"/>
-        <el-option label="禁用" value="0"/>
+        <el-option label="启用" value="1" />
+        <el-option label="禁用" value="0" />
       </el-select>
 
       <el-button v-perm="['/sys/user/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
@@ -14,7 +14,9 @@
     <data-tables-server :data="list" :filters="filters" :table-props="tableProps" :loading="listLoading" :pagination-props="{ pageSizes: [20, 50, 100] }" layout="table,pagination">
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
       <el-table-column label="状态" min-width="100px">
-        <template slot-scope="scope"/>
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.status | statusFilter" size="small">{{ scope.row.status | statusChange }}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="100px">
         <template slot-scope="scope">
@@ -27,11 +29,16 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
 
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model.trim="temp.name" placeholder="请输入用户名" />
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model.trim="temp.username" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="Email" prop="email">
-          <el-input v-model.trim="temp.remark" placeholder="请输入email" />
+          <el-input v-model.trim="temp.email" placeholder="请输入email" />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-select v-model="temp.role" class="filter-item" multiple="multiple">
+            <el-option v-for="item in roleOptions" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
@@ -55,7 +62,7 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 
-import { createUser, updateUser, deleteUser, getUserList } from '@/api/user'
+import { createUser, updateUser, deleteUser, getUserList, getRoleOptions, getUserRoles } from '@/api/user'
 
 // import random from 'string-random'
 
@@ -124,7 +131,8 @@ export default {
           order: 'ascending'
         }
       },
-
+      roleOptions: [],
+      currentUserRoles: [],
       btnsize: 'mini',
       dialogFormVisible: false,
       dialogStatus: '',
@@ -134,10 +142,11 @@ export default {
       },
       temp: {
         id: undefined,
-        name: '',
-        remark: '',
+        username: '',
+        email: '',
+        role: [],
         status: '1',
-        listorder: 99
+        listorder: 1000
       },
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
@@ -152,22 +161,26 @@ export default {
     // 获取数据
     fetchData() {
       this.listLoading = true
-
       getUserList().then(res => {
         console.log('getUserList', res)
         this.list = res.data.items
         this.total = res.data.total
         this.listLoading = false
       })
+      getRoleOptions().then(res => {
+        console.log('getRoleOptions', res)
+        this.roleOptions = res.data
+      })
     },
 
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
-        remark: '',
+        username: '',
+        email: '',
+        role: [],
         status: '1',
-        listorder: 99
+        listorder: 1000
       }
     },
     handleCreate() {
@@ -200,11 +213,23 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      this.temp.role = []
+      getUserRoles({ id: this.temp.id }).then(res => {
+        console.log(res)
+        this.currentUserRoles = res.data
+
+        for (const item of res.data) {
+          // console.log(item)
+          console.log(item.id)
+          this.temp.role.push(item.id)
+        }
+        // this.temp.role = ['1', '2']
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
       })
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

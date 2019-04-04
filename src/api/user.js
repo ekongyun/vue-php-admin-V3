@@ -35,3 +35,19 @@ export function deleteUser(form) {
     data: form
   })
 }
+
+// 新增、编辑角色权限，无需权限分配
+export function getRoleOptions(form) {
+  return request({
+    url: '/sys/user/getroleoptions',
+    method: 'get'
+  })
+}
+export function getUserRoles(form) {
+  return request({
+    url: '/sys/user/getuserroles',
+    method: 'post',
+    data: form
+  })
+}
+
