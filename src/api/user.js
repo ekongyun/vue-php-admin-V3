@@ -43,11 +43,3 @@ export function getRoleOptions(form) {
     method: 'get'
   })
 }
-export function getUserRoles(form) {
-  return request({
-    url: '/sys/user/getuserroles',
-    method: 'post',
-    data: form
-  })
-}
-

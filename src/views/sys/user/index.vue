@@ -2,16 +2,14 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-perm="['/sys/user/view']" v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
-      <el-select v-perm="['/sys/user/view']" v-model="filters[1].value" class="filter-item" multiple="multiple">
+      <el-select v-perm="['/sys/user/view']" v-model="filters[1].value" clearable class="filter-item">
         <el-option label="启用" value="1" />
         <el-option label="禁用" value="0" />
       </el-select>
-
       <el-button v-perm="['/sys/user/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
-
     </div>
 
-    <data-tables-server :data="list" :filters="filters" :table-props="tableProps" :loading="listLoading" :pagination-props="{ pageSizes: [20, 50, 100] }" layout="table,pagination">
+    <data-tables-server :data="list" :total="total" :filters="filters" :table-props="tableProps" :loading="listLoading" :page-size="5" :pagination-props="{ background: true, pageSizes: [5,10,20] }" layout="table,pagination" @query-change="fetchData">
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
       <el-table-column label="状态" min-width="100px">
         <template slot-scope="scope">
@@ -28,9 +26,8 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
-
         <el-form-item label="用户名" prop="username">
-          <el-input v-model.trim="temp.username" placeholder="请输入用户名" />
+          <el-input v-model.trim="temp.username" :readonly="readonly" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="Email" prop="email">
           <el-input v-model.trim="temp.email" placeholder="请输入email" />
@@ -62,7 +59,7 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 
-import { createUser, updateUser, deleteUser, getUserList, getRoleOptions, getUserRoles } from '@/api/user'
+import { createUser, updateUser, deleteUser, getUserList, getRoleOptions } from '@/api/user'
 
 // import random from 'string-random'
 
@@ -90,6 +87,7 @@ export default {
   },
   data() {
     return {
+      defaultQueryInfo: '',
       filters: [{
         prop: 'username',
         value: ''
@@ -100,10 +98,6 @@ export default {
       list: [],
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10
-      },
       titles: [
         {
           prop: 'id',
@@ -136,6 +130,7 @@ export default {
       btnsize: 'mini',
       dialogFormVisible: false,
       dialogStatus: '',
+      readonly: false,
       textMap: {
         update: '编辑',
         create: '新增'
@@ -149,30 +144,45 @@ export default {
         listorder: 1000
       },
       rules: {
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        role: [{ required: true, message: '请选择角色', trigger: 'blur' }]
       }
     }
   },
 
   created() {
-    this.fetchData()
+    // this.fetchData()
+    this.initRoleOptions()
   },
   methods: {
     // 获取数据
-    fetchData() {
+    fetchData(queryInfo) {
+      console.log('queryInfo', queryInfo)
+      if (!queryInfo) {
+        queryInfo = this.defaultQueryInfo
+        console.log(queryInfo)
+      }
+      // init 类型比较特殊在 created 时发射，保存默认的查询信息，更新数据后调用 fetchData 时 queryInfo为空时调用
+      if (queryInfo.type === 'init') {
+        this.defaultQueryInfo = queryInfo
+        console.log('defaultQueryInfo', this.defaultQueryInfo)
+      }
+
       this.listLoading = true
-      getUserList().then(res => {
+      getUserList(queryInfo).then(res => {
         console.log('getUserList', res)
         this.list = res.data.items
         this.total = res.data.total
         this.listLoading = false
       })
+    },
+
+    initRoleOptions() {
       getRoleOptions().then(res => {
         console.log('getRoleOptions', res)
         this.roleOptions = res.data
       })
     },
-
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -182,6 +192,7 @@ export default {
         status: '1',
         listorder: 1000
       }
+      this.readonly = false
     },
     handleCreate() {
       console.log('handleCreate...click')
@@ -213,23 +224,14 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.role = []
-      getUserRoles({ id: this.temp.id }).then(res => {
-        console.log(res)
-        this.currentUserRoles = res.data
+      console.log(this.temp)
+      this.readonly = true // 用户名不能修改, 只能删除
 
-        for (const item of res.data) {
-          // console.log(item)
-          console.log(item.id)
-          this.temp.role.push(item.id)
-        }
-        // this.temp.role = ['1', '2']
-        this.dialogStatus = 'update'
-        this.dialogFormVisible = true
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
       })
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -257,9 +259,8 @@ export default {
       }).then(() => {
         const tempData = {
           'id': row.id,
-          'name': row.username
+          'username': row.username
         }
-
         // 调用api删除数据
         deleteUser(tempData).then(res => {
           // 如果删除成功，后台重新更新数据,否则不更新数据
