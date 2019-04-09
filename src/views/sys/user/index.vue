@@ -9,7 +9,7 @@
       <el-button v-perm="['/sys/user/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
 
-    <data-tables-server :data="list" :total="total" :filters="filters" :table-props="tableProps" :loading="listLoading" :page-size="5" :pagination-props="{ background: true, pageSizes: [5,10,20] }" layout="table,pagination" @query-change="fetchData">
+    <data-tables-server :data="list" :search-def="searchDef" :total="total" :filters="filters" :table-props="tableProps" :loading="listLoading" :page-size="5" :pagination-props="{ background: true, pageSizes: [5,10,20] }" layout="table,pagination" @query-change="fetchData">
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
       <el-table-column label="状态" min-width="100px">
         <template slot-scope="scope">
@@ -28,6 +28,13 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="" label-width="90px" style="width: 400px; margin-left:50px;">
         <el-form-item label="用户名" prop="username">
           <el-input v-model.trim="temp.username" :readonly="readonly" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='create'" label="密码" prop="password">
+          <el-input v-model="temp.password" :type="passwordType">
+            <i slot="suffix" class="el-input__icon el-icon-eye" @click="showPwd">
+              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+            </i>
+          </el-input>
         </el-form-item>
         <el-form-item label="Email" prop="email">
           <el-input v-model.trim="temp.email" placeholder="请输入email" />
@@ -86,7 +93,21 @@ export default {
     }
   },
   data() {
+    // TODO: 参考login页面 引入校验函数 参考党建app mine-password 页面修改密码强度
+    const validatePassword = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('The password can not be less than 6 digits'))
+      } else {
+        callback()
+      }
+    }
+
     return {
+      passwordType: 'password',
+      searchDef: {
+        show: true,
+        debounceTime: 3000
+      },
       defaultQueryInfo: '',
       filters: [{
         prop: 'username',
@@ -138,6 +159,7 @@ export default {
       temp: {
         id: undefined,
         username: '',
+        password: '',
         email: '',
         role: [],
         status: '1',
@@ -145,6 +167,7 @@ export default {
       },
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         role: [{ required: true, message: '请选择角色', trigger: 'blur' }]
       }
     }
@@ -167,7 +190,6 @@ export default {
         this.defaultQueryInfo = queryInfo
         console.log('defaultQueryInfo', this.defaultQueryInfo)
       }
-
       this.listLoading = true
       getUserList(queryInfo).then(res => {
         console.log('getUserList', res)
@@ -187,6 +209,7 @@ export default {
       this.temp = {
         id: undefined,
         username: '',
+        password: '',
         email: '',
         role: [],
         status: '1',
@@ -279,6 +302,13 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       // this.getList()
+    },
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+      } else {
+        this.passwordType = 'password'
+      }
     }
   }
 }

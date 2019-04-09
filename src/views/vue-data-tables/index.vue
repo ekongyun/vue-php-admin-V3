@@ -14,7 +14,13 @@
       </el-row>
     </div>
 
-    <data-tables :data="data" :action-col="actionCol" :filters="filters" @selection-change="handleSelectionChange">
+    <data-tables :search-def="searchDef" :data="data" :action-col="actionCol" :filters="filters" layout="pagination, tool, table" @selection-change="handleSelectionChange">
+      <el-row slot="tool" style="margin: 10px 0">
+        <el-col :span="5" :offset="4">
+          <el-input v-model="filters[0].value"/>
+        </el-col>
+      </el-row>
+
       <el-table-column type="selection" width="55" />
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.prop" sortable="custom" />
     </data-tables>
@@ -44,13 +50,52 @@
     <el-tag>
       引用方法时 使用双层$refs 来引用el-table的方法： this.$refs.multipleTable.$refs.elTable.toggleRowSelection(row);
     </el-tag>
+
+    <password-validator/>
+
+    <div>
+      <el-form ref="loginForm" auto-complete="on" label-position="left" label-width="90px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="username" prop="username">
+
+          <el-input v-model="user.email" name="email" type="text" auto-complete="on" />
+        </el-form-item>
+
+        <el-form-item label="password" prop="password">
+
+          <el-input v-model="user.password" :type="passwordType" name="password" auto-complete="on">
+            <i slot="suffix" class="el-input__icon el-icon-eye" @click="showPwd"> <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" /></i>
+          </el-input>
+          <!-- <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span> -->
+        </el-form-item>
+      </el-form>
+    </div>
+
   </div>
 </template>
 
 <script>
+import PasswordValidator from 'vue-password-validator'
+import VuePassword from 'vue-password'
+
 export default {
+  components: {
+    PasswordValidator,
+    VuePassword
+  },
   data() {
     return {
+      passwordType: 'password',
+      strengthMessages: ['非常差', '差', 'Medium', 'Strong', 'Very Strong'],
+      user: {
+        email: '',
+        password: ''
+      },
+      searchDef: {
+        show: true,
+        debounceTime: 5000
+      },
       data: [],
       titles: [
         {
@@ -141,6 +186,13 @@ export default {
     }
   },
   methods: {
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+      } else {
+        this.passwordType = 'password'
+      }
+    },
     toggleSelection(rows) {
       console.log('rows', rows)
       if (rows) {
@@ -176,3 +228,73 @@ export default {
   }
 }
 </script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
+
+.login-container {
+  min-height: 100%;
+  width: 100%;
+  background-color: $bg;
+  overflow: hidden;
+  .login-form {
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .tips {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+    span {
+      &:first-of-type {
+        margin-right: 16px;
+      }
+    }
+  }
+  .svg-container {
+    padding: 6px 5px 6px 15px;
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 30px;
+    display: inline-block;
+  }
+  .title-container {
+    position: relative;
+    .title {
+      font-size: 26px;
+      color: $light_gray;
+      margin: 0px auto 40px auto;
+      text-align: center;
+      font-weight: bold;
+    }
+    .set-language {
+      color: #fff;
+      position: absolute;
+      top: 3px;
+      font-size: 18px;
+      right: 0px;
+      cursor: pointer;
+    }
+  }
+  .show-pwd {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+  }
+  .thirdparty-button {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+  }
+}
+</style>
