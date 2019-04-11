@@ -40,9 +40,10 @@
           <el-input v-model.trim="temp.email" placeholder="请输入email" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
-          <el-select v-model="temp.role" class="filter-item" multiple="multiple">
-            <el-option v-for="item in roleOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
+          <!-- <el-select v-model="temp.role" class="filter-item" multiple="multiple" @remove-tag="removeTag()">
+            <el-option v-for="item in roleOptions" :key="item.id" :label="item.name" :value="item.id" :disabled="item.disabled" />
+          </el-select> -->
+          <treeselect v-model="temp.role" :multiple="true" :clearable="false" :normalizer="normalizer" :options="roleOptions" placeholder="请选择角色..." />
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
@@ -69,12 +70,16 @@ import perm from '@/directive/perm/index.js' // 权限判断指令
 import { createUser, updateUser, deleteUser, getUserList, getRoleOptions } from '@/api/user'
 
 // import random from 'string-random'
+// import the component
+import Treeselect from '@riophae/vue-treeselect'
+// import the styles
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
   name: 'SysUserPhjc',
   // 所以在编写路由 router 和路由对应的 view component 的时候一定要确保 两者的 name 是完全一致的。
   // register the component Treeselect, TreeTable
-  components: {},
+  components: { Treeselect },
   directives: { waves, perm },
   filters: {
     statusFilter(status) {
@@ -103,6 +108,17 @@ export default {
     }
 
     return {
+      value: null,
+      // define treeselect options
+      TreeSelectOptions: [],
+      // 自定义treeselect key id,label
+      normalizer(node) {
+        return {
+          id: node.id,
+          label: node.name,
+          children: node.children
+        }
+      },
       passwordType: 'password',
       searchDef: {
         show: true,
@@ -178,6 +194,11 @@ export default {
     this.initRoleOptions()
   },
   methods: {
+    removeTag(args) {
+      console.log('removeTag...')
+      console.log(args)
+      return
+    },
     // 获取数据
     fetchData(queryInfo) {
       console.log('queryInfo', queryInfo)

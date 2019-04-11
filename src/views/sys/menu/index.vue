@@ -47,7 +47,7 @@
           <el-input v-model.trim="temp.title" :placeholder="menuTypeList[temp.type] + '名称'" />
         </el-form-item>
         <el-form-item label="上级菜单">
-          <treeselect v-model="temp.pid" :multiple="false" :clearable="false" :disable-branch-nodes="false" :show-count="true" :normalizer="normalizer" :options="TreeSelectOptions" />
+          <treeselect v-model="temp.pid" :multiple="false" :clearable="false" :disable-branch-nodes="false" :show-count="true" :normalizer="normalizer" :options="TreeSelectOptions" placeholder="请选择上级菜单..." />
         </el-form-item>
         <el-form-item label="路由" prop="path">
           <el-input v-model.trim="temp.path" :placeholder="menuTypeList[temp.type] + '路由, 例 /sys, /sys/menu'" />
