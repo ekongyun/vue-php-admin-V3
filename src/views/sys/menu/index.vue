@@ -62,15 +62,11 @@
           <el-input v-model.trim="temp.redirect" placeholder="面包屑组件重定向,例 /sys/menu, 可留空" />
         </el-form-item>
         <el-form-item v-if="temp.type !==2" label="图标">
-          <el-row>
-            <el-col :span="22">
-              <el-input v-model.trim="temp.icon" placeholder="系统管理/图标管理里复制图标名称, 例 email" />
-            </el-col>
-            <el-col :span="2">
+          <el-input v-model.trim="temp.icon" placeholder="系统管理/图标管理里复制名称, 例 email">
+            <i slot="suffix" class="el-input__icon el-icon-eye">
               <svg-icon :icon-class="temp.icon" />
-            </el-col>
-          </el-row>
-
+            </i>
+          </el-input>
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
@@ -403,3 +399,8 @@ export default {
   }
 }
 </script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+.el-icon-arrow-right:before {
+}
+</style>
