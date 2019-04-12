@@ -1,219 +1,93 @@
-<p align="center">
-  <img width="320" src="https://wpimg.wallstcn.com/ecc53a42-d79b-42e2-8852-5126b810a4c8.svg">
-</p>
+# 项目说明
 
-<p align="center">
-  <a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.5.17-brightgreen.svg" alt="vue">
-  </a>
-  <a href="https://github.com/ElemeFE/element">
-    <img src="https://img.shields.io/badge/element--ui-2.4.11-brightgreen.svg" alt="element-ui">
-  </a>
-  <a href="https://travis-ci.org/PanJiaChen/vue-element-admin" rel="nofollow">
-    <img src="https://travis-ci.org/PanJiaChen/vue-element-admin.svg?branch=master" alt="Build Status">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/releases">
-    <img src="https://img.shields.io/github/release/PanJiaChen/vue-element-admin.svg" alt="GitHub release">
-  </a>
-  <a href="https://gitter.im/vue-element-admin/discuss">
-    <img src="https://badges.gitter.im/Join%20Chat.svg" alt="gitter">
-  </a>
-  <a href="https://panjiachen.github.io/vue-element-admin-site/donate">
-    <img src="https://img.shields.io/badge/%24-donate-ff69b4.svg" alt="donate">
-  </a>
-</p>
+基于 vue-element-admin 和 PHP CodeIgniter RESTful 实现，
+采用前后端分离架构的权限管理系统，PHP快速开发平台，目标是搭建一
+套简洁易用的快速解决方案，可以帮助用户有效降低项目开发难度和成本。
 
-English | [简体中文](./README.zh-CN.md)
+以vue-element-admin@3.10.0 前端模板为基础，修改动态路由部分，实现菜单路由
+可根据后端角色进行动态加载。
 
-## Introduction
+将vue-element-admin前端原来样例模板除首页、文档外，其余样例模板
+归档集中在样例模板下，见 @router/index.js constantRouterMap，
+其余组件如 tags-views等，全部未做变化，可根据需要具体需求进行删减。 
 
-[vue-element-admin](http://panjiachen.github.io/vue-element-admin) is a front-end management background integration solution. It based on [vue](https://github.com/vuejs/vue) and use the UI Toolkit [element](https://github.com/ElemeFE/element).
+## 功能介绍
+1. 系统登录：系统用户登录，系统登录认证（token方式）
+2. 用户管理：新建用户，修改用户，删除用户，查询用户
+3. 角色管理：新建角色，修改角色，删除角色，查询角色
+4. 菜单管理：新建菜单，修改菜单，删除菜单，查询菜单
+5. 图标管理：vue-element-admin 原有封装组件
+6. ......
 
-It is a magical vue admin based on the newest development stack of vue, built-in i18n solution, typical templates for enterprise applications, lots of awesome features. It helps you build a large complex Single-Page Applications. I believe whatever your needs are, this project will help you.
+## 开发环境 
+- phpstudy  php 5.6.27 nts + Apache
+- vue.js
 
-- [Preview](http://panjiachen.github.io/vue-element-admin)
+## 后端开发框架 
+ - 后端 [PHP CI 3.1.10 RESTful](https://github.com/chriskacerguis/codeigniter-restserver)
+ - 前端 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin/)
 
-- [Documentation](https://panjiachen.github.io/vue-element-admin-site/)
+## 使用说明
 
-- [Gitter](https://gitter.im/vue-element-admin/discuss)
+### 前端
+1. 下载前端代码解压
+2. 修改接口配置
 
-- [Wiki](https://github.com/PanJiaChen/vue-element-admin/wiki)
+    cat config/dev.env.js
+    ```html
+        module.exports = {
+          NODE_ENV: '"development"',
+          ENV_CONFIG: '"dev"',
+          // BASE_API: '"https://api-dev"' 根据后端实际接口配置
+          BASE_API: '"http://www.cirest.com:8889/api/v2/"'
+        }
+    ```
+3. 运行
+    ```html
+       npm run dev
+    ```
 
-- [Donate](https://panjiachen.github.io/vue-element-admin-site/donate/)
+### 后端
+1. 下载后端代码解压
+2. 创建数据库 vueadmin, 导入 **vueadmin.sql** 文件
+3. 后端数据库连接配置 修改配置文件
 
-- [Gitee](https://panjiachen.gitee.io/vue-element-admin/) 国内用户可访问该地址在线预览
+    cat application\config\database.php
+    
+    ```php
+     $db['default'] = array(
+        'dsn'	=> '',
+        'hostname' => 'localhost',
+        'username' => 'root',
+        'password' => 'root',
+        'database' => 'vueadmin',
+        ...
+    ```
+4. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
 
-**This project is positioned as a background integration solution and is not suitable for secondary development as a basic template.**
+    www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v2/"'
 
-- Base template recommends using: [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template)
-- Desktop: [electron-vue-admin](https://github.com/PanJiaChen/electron-vue-admin)
-- Typescript: [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template) (Credits: [@Armour](https://github.com/Armour))
+    接口调用使用示例：
+    ```html    
+    http://www.cirest.com:8889/api/v2/sys/menu/testapi
+    http://www.cirest.com:8889/index.php/api/v2/sys/menu/testapi
+    
+    request header 配置 X-API-KEY: oocwo8cs88g4c8w8c08ow00ss844cc4osko0s0ks  
+    ```
+    带有 index.php 若要去掉 修改根目录下 CodeIgniter-3.1.10/.htaccess 文件(Apache), 注意不是 CodeIgniter-3.1.10/application/ 目录下
+    Nginx的话需要对应的配置
+    
+   cat CodeIgniter-3.1.10/.htaccess
 
-**This project does not support low version browsers (e.g. IE). Please add polyfill yourself if you need them.**
+    ```html
+      <IfModule mod_rewrite.c>
+        RewriteEngine on
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ /index.php?/$1 [QSA,PT,L]
+      </IfModule>
+    ```
 
-**Note: This project uses element-ui@2.3.0+ version, so the minimum compatible vue@2.5.0+**
-
-**Start using `webpack4` from `v3.8.0`. If you still want to continue using `webpack3`, please use this branch [webpack3](https://github.com/PanJiaChen/vue-element-admin/tree/webpack3)**
-
-## Preparation
-
-You need to install [node](http://nodejs.org/) and [git](https://git-scm.com/) locally. The project is based on [ES2015+](http://es6.ruanyifeng.com/), [vue](https://cn.vuejs.org/index.html), [vuex](https://vuex.vuejs.org/zh-cn/), [vue-router](https://router.vuejs.org/zh-cn/), [axios](https://github.com/axios/axios) and [element-ui](https://github.com/ElemeFE/element), all request data is simulated using [Mock.js](https://github.com/nuysoft/Mock).
-Understanding and learning this knowledge in advance will greatly help the use of this project.
-
----
-
- <p align="center">
-  <img width="900" src="https://wpimg.wallstcn.com/a5894c1b-f6af-456e-82df-1151da0839bf.png">
-</p>
-
-## Sponsors
-Become a sponsor and get your logo on our README on GitHub with a link to your site. [[Become a sponsor]](https://www.patreon.com/panjiachen)
-
-<a href="https://flatlogic.com/admin-dashboards?from=vue-element-admin"><img width="150px" src="https://wpimg.wallstcn.com/9c0b719b-5551-4c1e-b776-63994632d94a.png" /></a><p>Admin Dashboard Templates made with Vue, React and Angular.</p>
-
-## Features
-
-```
-- Login / Logout
-
-- Permission Authentication
-  - Page permission
-  - Directive permission
-  - Two-step login
-
-- Multi-environment build
-  - dev sit stage prod
-
-- Global Features
-  - I18n
-  - Multiple dynamic themes
-  - Dynamic sidebar (supports multi-level routing)
-  - Dynamic breadcrumb
-  - Tags-view (Tab page Support right-click operation)
-  - Svg Sprite
-  - Mock data
-  - Screenfull
-  - Responsive Sidebar
-
-- Editor
-  - Rich Text Editor
-  - Markdown Editor
-  - JSON Editor
-
-- Excel
-  - Export Excel
-  - Export zip
-  - Upload Excel
-  - Visualization Excel
-
-- Table
-  - Dynamic Table
-  - Drag And Drop Table
-  - Tree Table
-  - Inline Edit Table
-
-- Error Page
-  - 401
-  - 404
-
-- Components
-  - Avatar Upload
-  - Back To Top
-  - Drag Dialog
-  - Drag Select
-  - Drag Kanban
-  - Drag List
-  - SplitPane
-  - Dropzone
-  - Sticky
-  - CountTo
-
-- Advanced Example
-- Error Log
-- Dashboard
-- Guide Page
-- ECharts
-- Clipboard
-- Markdown to html
-```
-
-## Getting started
-
-```bash
-# clone the project
-git clone https://github.com/PanJiaChen/vue-element-admin.git
-
-# install dependency
-npm install
-
-# develop
-npm run dev
-```
-
-This will automatically open http://localhost:9527.
-
-## Build
-
-```bash
-# build for test environment
-npm run build:sit
-
-# build for production environment
-npm run build:prod
-```
-
-## Advanced
-
-```bash
-# --report to build with bundle size analytics
-npm run build:prod --report
-
-# --generate a bundle size analytics. default: bundle-report.html
-npm run build:prod --generate_report
-
-# --preview to start a server in local to preview
-npm run build:prod --preview
-
-# lint code
-npm run lint
-
-# auto fix
-npm run lint -- --fix
-```
-
-Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) for more information
-
-## Changelog
-
-Detailed changes for each release are documented in the [release notes](https://github.com/PanJiaChen/vue-element-admin/releases).
-
-## Online Demo
-
-[Preview](http://panjiachen.github.io/vue-element-admin)
-
-## Donate
-
-If you find this project useful, you can buy author a glass of juice :tropical_drink:
-
-![donate](https://wpimg.wallstcn.com/bd273f0d-83a0-4ef2-92e1-9ac8ed3746b9.png)
-
-[Paypal Me](https://www.paypal.me/panfree23)
-
-[Buy me a coffee](https://www.buymeacoffee.com/Pan)
-
-## Browsers support
-
-Modern browsers and Internet Explorer 10+.
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- | --------- |
-| IE10, IE11, Edge| last 2 versions| last 2 versions| last 2 versions
-
-## License
-
-[MIT](https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE)
-
-Copyright (c) 2017-present PanJiaChen
+## 编辑器 
+ - phpstrom
+ - vscode
