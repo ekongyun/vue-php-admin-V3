@@ -152,8 +152,8 @@ export const constantRouterMap = [
         alwaysShow: true, // will always show the root menu
         meta: {
           title: 'permission',
-          icon: 'lock',
-          roles: ['admin', 'editor'] // you can set roles in root nav
+          icon: 'lock'
+          // roles: ['admin', 'editor'] // you can set roles in root nav
         },
         children: [
           {
@@ -161,8 +161,8 @@ export const constantRouterMap = [
             component: () => import('@/views/permission/page'),
             name: 'PagePermission',
             meta: {
-              title: 'pagePermission',
-              roles: ['admin'] // or you can only set roles in sub nav
+              title: 'pagePermission'
+              // roles: ['admin'] // or you can only set roles in sub nav
             }
           },
           {

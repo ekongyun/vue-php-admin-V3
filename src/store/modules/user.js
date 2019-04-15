@@ -11,6 +11,7 @@ const user = {
     avatar: '',
     introduction: '',
     roles: [],
+    role_id: '',
     setting: {
       articlePlatform: []
     },
@@ -41,6 +42,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_ROLEID: (state, roles) => {
+      state.role_id = roles
     },
     SET_PHONE: (state, phone) => {
       console.log('..............phone.....')
@@ -87,6 +91,7 @@ const user = {
             reject('getInfo: roles must be a non-null array!')
           }
 
+          commit('SET_ROLEID', data.role_id)
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
           commit('SET_INTRODUCTION', data.introduction)
@@ -138,21 +143,44 @@ const user = {
     },
 
     // 动态修改权限
+    // 修改，token 不变化 只要求变化菜单及权限
     ChangeRoles({ commit, dispatch }, role) {
       return new Promise(resolve => {
-        commit('SET_TOKEN', role)
-        setToken(role)
+        // commit('SET_TOKEN', role)
+        // setToken(role)
         getUserInfo(role).then(response => {
           const data = response.data
           commit('SET_ROLES', data.roles)
+          commit('SET_ROLEID', data.role_id)
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
           commit('SET_INTRODUCTION', data.introduction)
+          commit('SET_PHONE', data.phone)
+          commit('SET_IDENTIFY', data.identify)
+          commit('SET_CTRLPERM', data.ctrlperm)
           dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
           resolve()
         })
       })
     }
+
+    // // 动态修改权限
+    // ChangeRoles({ commit, dispatch }, role) {
+    //   return new Promise(resolve => {
+    //     commit('SET_TOKEN', role)
+    //     setToken(role)
+    //     getUserInfo(role).then(response => {
+    //       const data = response.data
+    //       commit('SET_ROLES', data.roles)
+    //       commit('SET_NAME', data.name)
+    //       commit('SET_AVATAR', data.avatar)
+    //       commit('SET_INTRODUCTION', data.introduction)
+    //       dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
+    //       resolve()
+    //     })
+    //   })
+    // }
+
   }
 }
 

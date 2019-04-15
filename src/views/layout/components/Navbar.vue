@@ -7,10 +7,15 @@
     <div class="right-menu">
 
       <template v-if="device!=='mobile'">
-        <!-- <el-select v-model="value" placeholder="请选择" @change="roleChange()">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select> -->
+        <el-dropdown trigger="click" class="right-menu-item" @command="handleSetRole">
+          <div>
+            <svg-icon class-name="international-icon" icon-class="peoples" />
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="item in Roles" :key="item.id" :disabled="currentRole===item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+
         <search class="right-menu-item" />
 
         <error-log class="errLog-container right-menu-item hover-effect" />
@@ -75,48 +80,52 @@ export default {
     ThemePicker,
     Search
   },
-  data() {
-    return {
-      options: [{
-        value: '1',
-        label: '超级管理员'
-      }, {
-        value: '2',
-        label: '测试角色'
-      }],
-      value: '1'
-    }
-  },
   computed: {
     ...mapGetters([
       'sidebar',
       'name',
       'avatar',
       'device'
-    ])
+    ]),
+    currentRole() {
+      console.log('currentRole computed...', this.$store.getters.role_id)
+      return this.$store.getters.role_id
+    },
+    Roles() {
+      console.log('Roles computed...', this.$store.getters.roles)
+      return this.$store.getters.roles
+    }
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
+    },
+    handleSetRole(role) {
+      console.log('handleSetRole...', role)
+      this.$store.dispatch('ChangeRoles', role).then(() => {
+        this.$router.push({ path: '/' })
+        this.$message({
+          message: '切换角色成功',
+          type: 'success'
+        })
+        // location.reload()
+        // tags views 关闭所有
+        this.closeAllTags()
+      })
+    },
+    closeAllTags(view) {
+      this.$store.dispatch('delAllViews').then(({ visitedViews }) => {
+        this.toLastView(visitedViews)
+      })
+    },
+    toLastView(visitedViews) {
+      this.$router.push('/')
     },
     logout() {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
     }
-    // roleChange() {
-    //   const loginForm = {
-    //     username: 'qiaokun',
-    //     password: 'qiaokun'
-    //   }
-    //   // this.$router.push({ path: this.redirect || '/sys/menu' })
-    //   // this.$store.dispatch('get_userinfo',
-    //   //   this.$store.dispatch('LoginByUsername', loginForm).then(() => {
-    //   //     console.log('loginForm...', loginForm)
-    //   //   }).catch(() => {
-    //   //   })
-    //   // location.reload()
-    // }
   }
 }
 </script>
