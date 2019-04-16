@@ -191,7 +191,7 @@ export default {
 
   created() {
     // this.fetchData()
-    this.initRoleOptions()
+    // this.initRoleOptions()
   },
   methods: {
     removeTag(args) {
@@ -240,6 +240,7 @@ export default {
     },
     handleCreate() {
       console.log('handleCreate...click')
+      this.initRoleOptions()
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -267,6 +268,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.initRoleOptions()
       this.temp = Object.assign({}, row) // copy obj
       console.log(this.temp)
       this.readonly = true // 用户名不能修改, 只能删除
