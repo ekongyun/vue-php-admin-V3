@@ -45,6 +45,13 @@
           </el-select> -->
           <treeselect v-model="temp.role" :multiple="true" :clearable="false" :normalizer="normalizer" :options="roleOptions" placeholder="请选择角色..." />
         </el-form-item>
+
+        <el-form-item v-for="(item,index) in roledept" :prop="item.id" :label="item.name" :key="index">
+          {{ index }}/{{ roledept.length }} - {{ item.id }} - {{ item.name }}
+          <treeselect v-model="temp.roledept[item.id]" :multiple="true" :clearable="false" :options="deptOptions" :flat="true" :default-expand-level="1" sort-value-by="LEVEL" placeholder="请选择该角色关联机构..." />
+          {{ temp.roledept[item.id] }}
+        </el-form-item>
+
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
           <el-input-number v-model.trim="temp.listorder" :min="0" controls-position="right" onkeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" />
@@ -108,6 +115,23 @@ export default {
     }
 
     return {
+      deptOptions: [{
+        id: '1',
+        label: '河南分公司',
+        children: [{
+          id: '2',
+          label: '支撑中心'
+        }, {
+          id: '3',
+          label: '郑州公司'
+        }]
+      }, {
+        id: '4',
+        label: '河北公司'
+      }, {
+        id: '5',
+        label: '北京公司'
+      }],
       value: null,
       // define treeselect options
       TreeSelectOptions: [],
@@ -178,6 +202,7 @@ export default {
         password: '',
         email: '',
         role: [],
+        roledept: [],
         status: '1',
         listorder: 1000
       },
@@ -188,7 +213,27 @@ export default {
       }
     }
   },
-
+  computed: {
+    roledept() {
+      // this.temp.role
+      // this.roleOptions
+      //  [{"id":"1","name":"超级管理员","remark":"拥有网站最高管理员权限！","status":"1","isDisabled":true,"listorder":"1"},
+      //  {"id":"4","name":"测试角色","remark":"","status":"1","isDisabled":false,"listorder":"99"}]
+      if (this.temp.role) {
+        return this.roleOptions.filter((v) => {
+          // return v.isDisabled === false
+          for (let i = 0; i < this.temp.role.length; i++) {
+            // 超级管员员用户<->超级管理员角色 后台自动新增删除机构
+            if (v.id === this.temp.role[i] && v.isDisabled === false) {
+              return v
+            }
+          }
+        })
+      } else {
+        return []
+      }
+    }
+  },
   created() {
     // this.fetchData()
     // this.initRoleOptions()
@@ -233,6 +278,7 @@ export default {
         password: '',
         email: '',
         role: [],
+        roledept: [],
         status: '1',
         listorder: 1000
       }
@@ -250,6 +296,19 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
+        console.log('createData valid done...', this.temp)
+        console.log('createData valid done...', this.temp.roledept)
+        // 遍历 数组
+        // for (let i = 0; i < this.temp.roledept.length; i++) {
+        //   console.log('遍历 数组 ')
+        //   if (!this.temp.roledept[i]) {
+        //     console.log('空值删除')
+        //     this.temp.roledept.splice(i,1)
+        //   }
+        //   console.log(i, this.temp.roledept[i])
+        // }
+        // console.log('createData valid done...', this.temp.roledept)
+
         if (valid) {
           console.log('createData valid done...', this.temp)
 
