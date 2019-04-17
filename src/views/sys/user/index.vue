@@ -46,10 +46,10 @@
           <treeselect v-model="temp.role" :multiple="true" :clearable="false" :normalizer="normalizer" :options="roleOptions" placeholder="请选择角色..." />
         </el-form-item>
 
-        <el-form-item v-for="(item,index) in roledept" :prop="item.id" :label="item.name" :key="index">
-          {{ index }}/{{ roledept.length }} - {{ item.id }} - {{ item.name }}
-          <treeselect v-model="temp.roledept[item.id]" :multiple="true" :clearable="false" :options="deptOptions" :flat="true" :default-expand-level="1" sort-value-by="LEVEL" placeholder="请选择该角色关联机构..." />
-          {{ temp.roledept[item.id] }}
+        <el-form-item v-for="(item,index) in roledept" :label="item.name" :key="index" prop="roledept">
+          <!-- {{ index }}/{{ roledept.length }} - {{ item.id }} - {{ item.name }} -->
+          <treeselect v-model="temp.roledept[item.name+'-'+item.id]" :multiple="true" :clearable="false" :options="deptOptions" :flat="true" :default-expand-level="1" sort-value-by="LEVEL" placeholder="请选择该角色关联机构..." />
+          <!-- {{ temp.roledept[item.id] }} -->
         </el-form-item>
 
         <el-form-item label="排序ID">
@@ -203,6 +203,7 @@ export default {
         email: '',
         role: [],
         roledept: [],
+        roledepts: [],
         status: '1',
         listorder: 1000
       },
@@ -210,6 +211,7 @@ export default {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         role: [{ required: true, message: '请选择角色', trigger: 'blur' }]
+        // roledept: [{ required: true, message: '请选择角色关联', trigger: 'blur' }]
       }
     }
   },
@@ -279,6 +281,7 @@ export default {
         email: '',
         role: [],
         roledept: [],
+        roledepts: [],
         status: '1',
         listorder: 1000
       }
@@ -297,27 +300,27 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         console.log('createData valid done...', this.temp)
-        console.log('createData valid done...', this.temp.roledept)
-        // 遍历 数组
-        // for (let i = 0; i < this.temp.roledept.length; i++) {
-        //   console.log('遍历 数组 ')
-        //   if (!this.temp.roledept[i]) {
-        //     console.log('空值删除')
-        //     this.temp.roledept.splice(i,1)
-        //   }
-        //   console.log(i, this.temp.roledept[i])
-        // }
-        // console.log('createData valid done...', this.temp.roledept)
+        // roledept全局与this.temp.role 一一 对应
+        // this.temp.roldept 表单选择
+        for (let i = 0; i < this.roledept.length; i++) {
+          // 构造roledepts结构 {role_id:4,dept_id:["3","4"]}
+          const tmpJson = {
+            role_id: this.roledept[i].id,
+            dept_id: this.temp.roledept[this.roledept[i].name + '-' + this.roledept[i].id]
+          }
+          this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
+        }
 
         if (valid) {
-          console.log('createData valid done...', this.temp)
-
+          // console.log('createData valid done...', this.temp)
           // 调用api创建数据入库
           createUser(this.temp).then(res => {
             // 成功后 关闭窗口
             console.log('createUser...', res)
-            this.fetchData()
-            this.dialogFormVisible = false
+            if (res.type === 'success') {
+              this.fetchData()
+              this.dialogFormVisible = false
+            }
             this.$notify({
               message: res.message,
               type: res.type
@@ -340,6 +343,17 @@ export default {
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
+        this.temp.roledepts = [] // 需要重置一下？
+        for (let i = 0; i < this.roledept.length; i++) {
+          // 构造roledepts结构 {role_id:4,dept_id:["3","4"]}
+          const tmpJson = {
+            role_id: this.roledept[i].id,
+            dept_id: this.temp.roledept[this.roledept[i].name + '-' + this.roledept[i].id]
+          }
+          this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
+        }
+        console.log(this.temp)
+        console.log('this.temp.roledepts', this.temp.roledepts)
         if (valid) {
           // 调用api编辑数据入库
           updateUser(this.temp).then(res => {
