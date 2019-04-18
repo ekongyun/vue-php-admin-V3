@@ -47,9 +47,7 @@
         </el-form-item>
 
         <el-form-item v-for="(item,index) in roledept" :label="item.name" :key="index" prop="roledept">
-          <!-- {{ index }}/{{ roledept.length }} - {{ item.id }} - {{ item.name }} -->
           <treeselect v-model="temp.roledept[item.name+'-'+item.id]" :multiple="true" :clearable="false" :options="deptOptions" :flat="true" :default-expand-level="1" sort-value-by="LEVEL" placeholder="请选择该角色关联机构..." />
-          <!-- {{ temp.roledept[item.id] }} -->
         </el-form-item>
 
         <el-form-item label="排序ID">
@@ -202,7 +200,7 @@ export default {
         password: '',
         email: '',
         role: [],
-        roledept: [],
+        roledept: [], // 实际为对象?
         roledepts: [],
         status: '1',
         listorder: 1000
@@ -236,11 +234,40 @@ export default {
       }
     }
   },
+  // watch 监控变量的更改
+  watch: {
+    'temp.role': function(newV, oldV) {
+      const arr = this.subSet(oldV, newV)
+      if (arr[0]) {
+        // 角色减少时，点击角色选择的X号时，查找减少的role_id
+        // 并且 重置该role_id对应的this.temp.roledept 值为[] 即可
+        for (let i = 0; i < this.roleOptions.length; i++) {
+          if (this.roleOptions[i].id === arr[0]) {
+            // console.log(this.roleOptions[i].name + '-' + this.roleOptions[i].id)
+            // console.log(this.temp.roledept[this.roleOptions[i].name + '-' + this.roleOptions[i].id])
+            this.temp.roledept[this.roleOptions[i].name + '-' + this.roleOptions[i].id] = []
+          }
+        }
+      }
+    }
+  },
   created() {
     // this.fetchData()
     // this.initRoleOptions()
   },
   methods: {
+    // ES6方式 返回数组arr1中比arr2中多出的元素，返回类型为数组
+    subSet(arr1, arr2) {
+      var set1 = new Set(arr1)
+      var set2 = new Set(arr2)
+      var subset = []
+      for (const item of set1) {
+        if (!set2.has(item)) {
+          subset.push(item)
+        }
+      }
+      return subset
+    },
     removeTag(args) {
       console.log('removeTag...')
       console.log(args)
@@ -299,16 +326,27 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
-        console.log('createData valid done...', this.temp)
+        // console.log('createData valid done...', this.temp)
         // roledept全局与this.temp.role 一一 对应
-        // this.temp.roldept 表单选择
-        for (let i = 0; i < this.roledept.length; i++) {
+        // this.temp.roldept 表单选择 ObServer 对象 for-in 遍历
+        this.temp.roledepts = []
+        for (var key in this.temp.roledept) {
           // 构造roledepts结构 {role_id:4,dept_id:["3","4"]}
-          const tmpJson = {
-            role_id: this.roledept[i].id,
-            dept_id: this.temp.roledept[this.roledept[i].name + '-' + this.roledept[i].id]
+          if (this.temp.roledept[key].length !== 0) {
+            const tmpJson = {
+              role_id: key.split('-')[1],
+              dept_id: this.temp.roledept[key]
+            }
+            this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
           }
-          this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
+        }
+
+        if (this.temp.role.length !== this.temp.roledepts.length) {
+          this.$notify({
+            message: '所选的角色没有关联对应机构, 请检查',
+            type: 'error'
+          })
+          return
         }
 
         if (valid) {
@@ -344,16 +382,25 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         this.temp.roledepts = [] // 需要重置一下？
-        for (let i = 0; i < this.roledept.length; i++) {
+        for (var key in this.temp.roledept) {
           // 构造roledepts结构 {role_id:4,dept_id:["3","4"]}
-          const tmpJson = {
-            role_id: this.roledept[i].id,
-            dept_id: this.temp.roledept[this.roledept[i].name + '-' + this.roledept[i].id]
+          if (this.temp.roledept[key].length !== 0) {
+            const tmpJson = {
+              role_id: key.split('-')[1],
+              dept_id: this.temp.roledept[key]
+            }
+            this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
           }
-          this.temp.roledepts = this.temp.roledepts.concat(tmpJson)
         }
-        console.log(this.temp)
-        console.log('this.temp.roledepts', this.temp.roledepts)
+
+        if (this.temp.role.length !== this.temp.roledepts.length) {
+          this.$notify({
+            message: '所选的角色没有关联对应机构, 请检查',
+            type: 'error'
+          })
+          return
+        }
+
         if (valid) {
           // 调用api编辑数据入库
           updateUser(this.temp).then(res => {
