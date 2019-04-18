@@ -281,10 +281,13 @@ export default {
         console.log(queryInfo)
       }
       // init 类型比较特殊在 created 时发射，保存默认的查询信息，更新数据后调用 fetchData 时 queryInfo为空时调用
-      if (queryInfo.type === 'init') {
-        this.defaultQueryInfo = queryInfo
-        console.log('defaultQueryInfo', this.defaultQueryInfo)
-      }
+      // if (queryInfo.type === 'init') {
+      //   this.defaultQueryInfo = queryInfo
+      //   console.log('defaultQueryInfo', this.defaultQueryInfo)
+      // }
+      // defaultQueryInfo 永远保留上次 queryInfo 更新数据后 后调用 fetchData 时，不会初始化到时init 首次页面
+      this.defaultQueryInfo = queryInfo
+
       this.listLoading = true
       getUserList(queryInfo).then(res => {
         console.log('getUserList', res)
