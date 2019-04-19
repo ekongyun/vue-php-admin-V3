@@ -38,9 +38,9 @@
         </div>
         <div class="tips">
           <span style="margin-right:18px;">
-            普通{{ $t('login.username') }} : editor
+            普通{{ $t('login.username') }} : qiaokun
           </span>
-          <span>{{ $t('login.password') }} : editor</span>
+          <span>{{ $t('login.password') }} : qiaokun</span>
         </div>
 
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
