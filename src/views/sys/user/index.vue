@@ -43,11 +43,23 @@
           <!-- <el-select v-model="temp.role" class="filter-item" multiple="multiple" @remove-tag="removeTag()">
             <el-option v-for="item in roleOptions" :key="item.id" :label="item.name" :value="item.id" :disabled="item.disabled" />
           </el-select> -->
-          <treeselect v-model="temp.role" :multiple="true" :clearable="false" :normalizer="normalizer" :options="roleOptions" placeholder="请选择角色..." />
+          <treeselect v-model="temp.role" :multiple="true" :clearable="false" :normalizer="normalizer" :options="roleOptions" :limit="2" :required="true" :limit-text=" count => `+ ${count}`" placeholder="请选择角色..." />
         </el-form-item>
 
         <el-form-item v-for="(item,index) in roledept" :label="item.name" :key="index" prop="roledept">
-          <treeselect v-model="temp.roledept[item.name+'-'+item.id]" :multiple="true" :clearable="false" :options="deptOptions" :flat="true" :default-expand-level="1" sort-value-by="LEVEL" placeholder="请选择该角色关联机构..." />
+          <treeselect
+            v-model="temp.roledept[item.name+'-'+item.id]"
+            :multiple="true"
+            :clearable="false"
+            :required="true"
+            :options="deptOptions"
+            :flat="true"
+            :max-height="200"
+            :limit="2"
+            :limit-text=" count => `+ ${count}`"
+            :default-expand-level="1"
+            sort-value-by="LEVEL"
+            placeholder="请选择该角色关联机构..." />
         </el-form-item>
 
         <el-form-item label="排序ID">
