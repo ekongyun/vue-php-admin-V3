@@ -19,6 +19,8 @@ const getters = {
   phone: state => state.user.phone,
   identify: state => state.user.identify,
   ctrlperm: state => state.user.ctrlperm,
+  depts: state => state.user.depts,
+  roleoptions: state => state.user.roleoptions,
   // 获取商品总价 getters 与 state 都是 store 里面的关键字 作用不同，state 存储固定数据，getters 返回动态计算数据
   totalPrice: state => {
     let totalPrice = 0

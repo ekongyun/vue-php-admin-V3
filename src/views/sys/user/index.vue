@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-perm="['/sys/user/view']" v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
+      <el-input v-perm="['/sys/user/view']" v-model="filters[0].value" placeholder="用户名" style="width: 200px;" class="filter-item" />
       <el-select v-perm="['/sys/user/view']" v-model="filters[1].value" clearable class="filter-item">
         <el-option label="启用" value="1" />
         <el-option label="禁用" value="0" />
@@ -9,7 +9,7 @@
       <el-button v-perm="['/sys/user/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
 
-    <data-tables-server :data="list" :search-def="searchDef" :total="total" :filters="filters" :table-props="tableProps" :loading="listLoading" :page-size="5" :pagination-props="{ background: true, pageSizes: [5,10,20] }" layout="table,pagination" @query-change="fetchData">
+    <data-tables-server :data="list" :search-def="searchDef" :total="total" :filters="filters" :table-props="tableProps" :loading="listLoading" :page-size="20" :pagination-props="{ background: true, pageSizes: [20,50,100] }" layout="table,pagination" @query-change="fetchData">
       <el-table-column v-for="title in titles" :prop="title.prop" :label="title.label" :key="title.label" sortable="custom" />
       <el-table-column label="状态" min-width="100px">
         <template slot-scope="scope">
@@ -72,7 +72,7 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 
-import { createUser, updateUser, deleteUser, getUserList, getRoleOptions } from '@/api/user'
+import { createUser, updateUser, deleteUser, getUserList } from '@/api/user'
 
 // import random from 'string-random'
 // import the component
@@ -113,23 +113,6 @@ export default {
     }
 
     return {
-      deptOptions: [{
-        id: '1',
-        label: '河南分公司',
-        children: [{
-          id: '2',
-          label: '支撑中心'
-        }, {
-          id: '3',
-          label: '郑州公司'
-        }]
-      }, {
-        id: '4',
-        label: '河北公司'
-      }, {
-        id: '5',
-        label: '北京公司'
-      }],
       value: null,
       // define treeselect options
       TreeSelectOptions: [],
@@ -184,6 +167,7 @@ export default {
           order: 'ascending'
         }
       },
+      deptOptions: [],
       roleOptions: [],
       currentUserRoles: [],
       btnsize: 'mini',
@@ -253,7 +237,7 @@ export default {
   },
   created() {
     // this.fetchData()
-    // this.initRoleOptions()
+    this.initRoleAndDeptOptions()
   },
   methods: {
     // ES6方式 返回数组arr1中比arr2中多出的元素，返回类型为数组
@@ -296,12 +280,45 @@ export default {
         this.listLoading = false
       })
     },
+    initRoleAndDeptOptions() {
+      // console.log(' this.initDeptOptions.... ')
+      this.roleOptions = this.$store.getters.roleoptions
+      this.deptOptions = this.formatTree(this.$store.getters.depts)
+    },
+    // 格式化成树
+    formatTree(json) {
+      var ret = []
+      var o = {}
+      function add(arr, data) {
+        var obj = {
+          'id': data.id,
+          'pid': data.pid,
+          'label': data.label,
+          'children': []
+        }
+        o[data.id] = obj
+        arr.push(obj)
+      }
 
-    initRoleOptions() {
-      getRoleOptions().then(res => {
-        console.log('getRoleOptions', res)
-        this.roleOptions = res.data
+      json.forEach(x => {
+        if (o[x.pid]) {
+          add(o[x.pid].children, x)
+        } else {
+          add(ret, x)
+        }
       })
+      // 遍历 将children为空的 剔除该属性 适合treeselect组件
+      this.dealnullchild(ret)
+      return ret
+    },
+    dealnullchild(jsonTreeArr) {
+      for (var i = 0; i < jsonTreeArr.length; i++) {
+        if (jsonTreeArr[i].children.length === 0) {
+          delete jsonTreeArr[i]['children']
+        } else {
+          this.dealnullchild(jsonTreeArr[i].children)
+        }
+      }
     },
     resetTemp() {
       this.temp = {
@@ -319,7 +336,6 @@ export default {
     },
     handleCreate() {
       console.log('handleCreate...click')
-      this.initRoleOptions()
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -371,7 +387,6 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.initRoleOptions()
       this.temp = Object.assign({}, row) // copy obj
       console.log(this.temp)
       this.readonly = true // 用户名不能修改, 只能删除

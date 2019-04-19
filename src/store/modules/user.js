@@ -12,10 +12,12 @@ const user = {
     introduction: '',
     roles: [],
     role_id: '',
+    depts: [],
+    roleoptions: [],
     setting: {
       articlePlatform: []
     },
-    ctrlperm: ''
+    ctrlperm: []
   },
 
   mutations: {
@@ -56,6 +58,12 @@ const user = {
     },
     SET_CTRLPERM: (state, ctrlperm) => {
       state.ctrlperm = ctrlperm
+    },
+    SET_DEPTS: (state, depts) => {
+      state.depts = depts
+    },
+    SET_ROLEOPTIONS: (state, roleoptions) => {
+      state.roleoptions = roleoptions
     }
   },
 
@@ -98,6 +106,8 @@ const user = {
           commit('SET_PHONE', data.phone)
           commit('SET_IDENTIFY', data.identify)
           commit('SET_CTRLPERM', data.ctrlperm)
+          commit('SET_DEPTS', data.depts)
+          commit('SET_ROLEOPTIONS', data.roleoptions)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -158,6 +168,8 @@ const user = {
           commit('SET_PHONE', data.phone)
           commit('SET_IDENTIFY', data.identify)
           commit('SET_CTRLPERM', data.ctrlperm)
+          commit('SET_DEPTS', data.depts)
+          commit('SET_ROLEOPTIONS', data.roleoptions)
           dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
           resolve()
         })
