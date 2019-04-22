@@ -245,6 +245,11 @@ export default {
           }
         }
       }
+    },
+    'temp.roledept': function(newV, oldV) {
+      console.log(oldV)
+      console.log('===>')
+      console.log(newV)
     }
   },
   created() {

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-perm="['/sys/menu/view']" v-model="filterText" placeholder="菜单名" style="width: 200px;" class="filter-item" />
+      <el-input v-perm="['/sys/menu/view']" v-model="filterText" placeholder="菜单名称" style="width: 200px;" class="filter-item" />
       <!-- <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button> -->
       <el-button v-perm="['/sys/menu/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>

@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="filters[0].value" placeholder="角色名" style="width: 200px;" class="filter-item" />
-      <el-select v-model="filters[1].value" class="filter-item" multiple="multiple">
+      <el-input v-perm="['/sys/role/view']" v-model="filters[0].value" placeholder="角色名称" style="width: 200px;" class="filter-item" />
+      <el-select v-perm="['/sys/role/view']" v-model="filters[1].value" class="filter-item" multiple="multiple">
         <el-option label="启用" value="1" />
         <el-option label="禁用" value="0" />
       </el-select>
-      <el-button v-waves v-perm="['/sys/role/view']" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <!-- <el-button v-waves v-perm="['/sys/role/view']" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button> -->
       <el-button v-perm="['/sys/role/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('table.add') }}</el-button>
 
       <!-- <el-input placeholder="名称" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />

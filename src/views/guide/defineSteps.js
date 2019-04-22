@@ -24,6 +24,14 @@ const steps = [
     }
   },
   {
+    element: '.roles-switch',
+    popover: {
+      title: '角色切换',
+      description: '用户角色切换',
+      position: 'left'
+    }
+  },
+  {
     element: '.international-icon',
     popover: {
       title: 'Switch language',

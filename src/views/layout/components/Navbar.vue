@@ -9,7 +9,7 @@
       <template v-if="device!=='mobile'">
         <el-dropdown trigger="click" class="right-menu-item" @command="handleSetRole">
           <div>
-            <svg-icon class-name="international-icon" icon-class="peoples" />
+            <svg-icon class="roles-switch" icon-class="peoples" />
           </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="item in Roles" :key="item.id" :disabled="currentRole===item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
