@@ -84,7 +84,7 @@
 import waves from '@/directive/waves' // Waves directive
 import perm from '@/directive/perm/index.js' // 权限判断指令
 
-import { createUser, updateUser, deleteUser, getUserList } from '@/api/user'
+import { createUser, updateUser, deleteUser, getUserList, getRoleOptions, getDeptOptions } from '@/api/user'
 
 // import random from 'string-random'
 // import the component
@@ -254,7 +254,7 @@ export default {
   },
   created() {
     // this.fetchData()
-    this.initRoleAndDeptOptions()
+    // this.initRoleAndDeptOptions()
   },
   methods: {
     // ES6方式 返回数组arr1中比arr2中多出的元素，返回类型为数组
@@ -296,11 +296,6 @@ export default {
         this.total = res.data.total
         this.listLoading = false
       })
-    },
-    initRoleAndDeptOptions() {
-      // console.log(' this.initDeptOptions.... ')
-      this.roleOptions = this.$store.getters.roleoptions
-      this.deptOptions = this.formatTree(this.$store.getters.depts)
     },
     // 格式化成树
     formatTree(json) {
@@ -356,6 +351,12 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      getRoleOptions().then(res => {
+        this.roleOptions = res.data
+      })
+      getDeptOptions().then(res => {
+        this.deptOptions = this.formatTree(res.data)
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -410,6 +411,12 @@ export default {
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      getRoleOptions().then(res => {
+        this.roleOptions = res.data
+      })
+      getDeptOptions().then(res => {
+        this.deptOptions = this.formatTree(res.data)
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

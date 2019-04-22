@@ -211,9 +211,6 @@ export default {
         this.tableData = res.data
         this.tableDatax = res.data
       })
-      getTreeOptions().then(res => {
-        this.TreeSelectOptions = res.data
-      })
     },
     editItem(row) {
       this.tempItem = Object.assign({}, row)
@@ -254,6 +251,9 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      getTreeOptions().then(res => {
+        this.TreeSelectOptions = res.data
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -291,6 +291,9 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      getTreeOptions().then(res => {
+        this.TreeSelectOptions = res.data
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

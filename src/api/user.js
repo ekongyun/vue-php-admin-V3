@@ -39,7 +39,14 @@ export function deleteUser(form) {
 // 新增、编辑角色权限，无需权限分配
 export function getRoleOptions(form) {
   return request({
-    url: '/sys/user/getroleoptions',
+    url: '/sys/user/roleoptions',
+    method: 'get'
+  })
+}
+
+export function getDeptOptions(form) {
+  return request({
+    url: '/sys/user/deptoptions',
     method: 'get'
   })
 }
