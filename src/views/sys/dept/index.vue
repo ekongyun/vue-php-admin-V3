@@ -5,7 +5,20 @@
       <el-button v-perm="['/sys/dept/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
-    <el-tree ref="tree2" :data="data" :props="defaultProps" :default-expand-all="true" :filter-node-method="filterNode" :expand-on-click-node="false" class="filter-tree" node-key="id" accordion highlight-current>
+    <el-tree
+      ref="tree2"
+      :data="data"
+      :props="defaultProps"
+      :default-expand-all="false"
+      :default-expanded-keys="treeExpandedKeys"
+      :filter-node-method="filterNode"
+      :expand-on-click-node="false"
+      node-key="id"
+      class="filter-tree"
+      accordion
+      highlight-current
+      @node-expand="treeExpand"
+      @node-collapse="treeCollapse">
       <span slot-scope="{ node, data }" class="custom-tree-node">
         <span>{{ node.label }}</span>
         <span>
@@ -29,7 +42,7 @@
           <el-input v-model.trim="temp.aliasname" placeholder="请输入机构别名" />
         </el-form-item>
         <el-form-item label="上级机构">
-          <treeselect v-model="temp.pid" :multiple="false" :clearable="false" :disable-branch-nodes="false" :show-count="true" :options="TreeSelectOptions" placeholder="请选择上级机构..." />
+          <treeselect v-model="temp.pid" :multiple="false" :clearable="false" :disable-branch-nodes="false" :show-count="true" :options="TreeSelectOptions" :normalizer="normalizer" placeholder="请选择上级机构..." />
         </el-form-item>
         <el-form-item label="排序ID">
           <!-- onkeypress 防止录入e 及其他字符 -->
@@ -93,10 +106,19 @@ export default {
       },
       // define treeselect options
       TreeSelectOptions: [],
+      // 自定义treeselect key id,label
+      normalizer(node) {
+        return {
+          id: node.id,
+          label: node.name,
+          children: node.children
+        }
+      },
       data: [],
+      treeExpandedKeys: [1], // 记录打开节点的数组 默认打开节点为id=1
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'name'
       },
       rules: {
         name: [{ required: true, message: '请输入机构名称', trigger: 'blur' }],
@@ -113,6 +135,7 @@ export default {
   created() {
     this.fetchData()
   },
+
   methods: {
     // 获取数据
     fetchData() {
@@ -122,16 +145,28 @@ export default {
         this.TreeSelectOptions = [{
           id: 0,
           pid: -1,
-          label: '顶级机构',
+          name: '顶级机构',
           children: res.data
         }]
-
         this.listLoading = false
       })
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.label.indexOf(value) !== -1
+      // data.name 根据实际修改
+      return data.name.indexOf(value) !== -1
+    },
+
+    // 当节点打开时，记录下打开节点的id
+    treeExpand(data, node, self) {
+      this.treeExpandedKeys.push(data.id)
+    },
+    // 当节点折叠时，移除节点的id
+    treeCollapse(data) {
+      const index = this.treeExpandedKeys.indexOf(data.id)
+      if (index > -1) {
+        this.treeExpandedKeys.splice(index, 1)
+      }
     },
 
     resetTemp() {
@@ -176,9 +211,7 @@ export default {
     },
 
     handleUpdate(data) {
-      data.name = data.label
       this.temp = Object.assign({}, data) // copy obj
-      delete (this.temp['label'])
       // this.readonly = false // 机构名不能修改, 只能删除?
 
       this.dialogStatus = 'update'
@@ -215,12 +248,12 @@ export default {
     },
 
     handleDelete(node, data) {
-      this.$confirm('确认删除选中记录吗？[机构: ' + data.label + ']', '提示', {
+      this.$confirm('确认删除选中记录吗？[机构: ' + data.name + ']', '提示', {
         type: 'warning'
       }).then(() => {
         const tempData = {
           'id': data.id,
-          'name': data.label
+          'name': data.name
         }
         // 调用api删除数据
         deleteDept(tempData).then(res => {
