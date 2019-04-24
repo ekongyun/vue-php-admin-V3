@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-perm="['/sys/menu/view']" v-model.trim="filterText" placeholder="菜单名称" style="width: 200px;" class="filter-item" />
+      <el-input v-perm="['/sys/menu/view']" v-model="filterText" placeholder="菜单名称" style="width: 200px;" class="filter-item" />
       <!-- <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button> -->
       <el-button v-perm="['/sys/menu/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
+      <el-switch v-model="defaultExpandAll" :active-text="defaultExpandAll?'展开节点':'折叠节点'" :active-value="true" :inactive-value="false" inactive-color="gainsboro" />
     </div>
     <!-- tableData.filter( data => !filterText || filterData(data, function(item){return item.title.includes(filterText) })) -->
     <el-table ref="TreeTable" :data="tableData" row-key="id" highlight-current-row stripe @selection-change="selectChange">
@@ -124,6 +125,7 @@ export default {
         sort: '+id'
       },
       downloadLoading: false,
+      defaultExpandAll: false,
       tableData: [],
       tableDatax: [],
       dialogFormVisible: false,
@@ -164,24 +166,22 @@ export default {
     }
   },
   watch: {
+    defaultExpandAll(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.expandAll()
+        })
+      } else {
+        this.$nextTick(() => {
+          this.expandAll()
+        })
+      }
+    },
     filterText(val) {
       if (!val) {
         //  为空 重置初始值
         this.tableData = this.tableDatax
       } else {
-        // this.tableData = this.filterData(this.tableData, item => { return item.title.includes(val) })
-        // console.log('this.$refs.TreeTable', this.$refs.TreeTable)
-        // console.log('this.$refs.TreeTable.$el...', this.$refs.TreeTable.$el)
-        // console.log('this.$refs.TreeTable.$el...', this.$refs.TreeTable.$el.getElementsByClassName('el-table__expand-icon'))
-        // const els = this.$refs.TreeTable.$el.getElementsByClassName('.el-icon-arrow-right')
-        // this.$nextTick(() => {
-        //   for (let i = 0; i < els.length; i++) {
-        //     // els[i].click()
-        //     console.log(els[i])
-        //     els[i].click()
-        //   }
-        // })
-
         // 1. 遍历树对像 返回符合filter条件的数组.findset[],并且转化成的扁平数据treearr
         const tmp = this.TravelTree(this.tableDatax, val)
         // 2.findset 里的每个 id 递归找出其父节点 每个节点一个数组，最后将这些数组合并去重，形成新的treearr再转换成treeobject
@@ -190,6 +190,11 @@ export default {
           tmpArr = _.union(_.concat(tmpArr, this.TravelTreeArr(tmp.treearr, tmp.findset[i])))
         }
         this.tableData = this.listToTreeWithLevel(tmpArr, 0, 0)
+
+        // 搜索时展开行
+        this.$nextTick(() => {
+          this.expandAll()
+        })
       }
     }
   },
@@ -198,7 +203,16 @@ export default {
     // console.log('this.$store.state.user.ctrlperm', this.$store.state.user.ctrlperm)
     this.getData()
   },
+
   methods: {
+    expandAll() {
+      const els = this.$refs.TreeTable.$el.getElementsByClassName('el-table__expand-icon')
+      // el-icon-arrow-right
+      // console.log('els..length/2....', els.length / 2) // 必须除以2
+      for (let i = 0; i < els.length / 2; i++) {
+        els[i].click()
+      }
+    },
     // 遍历json树 过滤符合条件节点，并且扁平化成array
     TravelTree(jsonTree, filterText) {
       var ret = {
@@ -277,6 +291,12 @@ export default {
         console.log('getMenuTree', res)
         this.tableData = res.data
         this.tableDatax = res.data
+        // 展开所有行
+        // if (this.defaultExpandAll) {
+        //   this.$nextTick(() => {
+        //     this.expandAll()
+        //   })
+        // }
       })
     },
     editItem(row) {
