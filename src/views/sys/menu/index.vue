@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-perm="['/sys/menu/view']" v-model="filterText" placeholder="菜单名称" style="width: 200px;" class="filter-item" />
+      <el-input v-perm="['/sys/menu/view']" v-model.trim="filterText" placeholder="菜单名称" style="width: 200px;" class="filter-item" />
       <!-- <el-button v-waves class="filter-item" type="primary" :size="btnsize" icon="el-icon-search" v-perm="['/sys/menu/view']" @click="handleFilter">查询</el-button> -->
       <el-button v-perm="['/sys/menu/add']" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">添加</el-button>
     </div>
@@ -96,6 +96,7 @@ import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 import random from 'string-random'
+import _ from 'lodash'
 
 export default {
   name: 'SysMenuSnIc',
@@ -168,11 +169,27 @@ export default {
         //  为空 重置初始值
         this.tableData = this.tableDatax
       } else {
-        // console.log(this.tableData)
-        // console.log(this.filterData(this.tableData, function (item) {
-        //   return item.title.includes(val)
-        // }))
-        this.tableData = this.filterData(this.tableData, item => { return item.title.includes(val) })
+        // this.tableData = this.filterData(this.tableData, item => { return item.title.includes(val) })
+        // console.log('this.$refs.TreeTable', this.$refs.TreeTable)
+        // console.log('this.$refs.TreeTable.$el...', this.$refs.TreeTable.$el)
+        // console.log('this.$refs.TreeTable.$el...', this.$refs.TreeTable.$el.getElementsByClassName('el-table__expand-icon'))
+        // const els = this.$refs.TreeTable.$el.getElementsByClassName('.el-icon-arrow-right')
+        // this.$nextTick(() => {
+        //   for (let i = 0; i < els.length; i++) {
+        //     // els[i].click()
+        //     console.log(els[i])
+        //     els[i].click()
+        //   }
+        // })
+
+        // 1. 遍历树对像 返回符合filter条件的数组.findset[],并且转化成的扁平数据treearr
+        const tmp = this.TravelTree(this.tableDatax, val)
+        // 2.findset 里的每个 id 递归找出其父节点 每个节点一个数组，最后将这些数组合并去重，形成新的treearr再转换成treeobject
+        let tmpArr = [] // 新扁平数组
+        for (let i = 0; i < tmp.findset.length; i++) {
+          tmpArr = _.union(_.concat(tmpArr, this.TravelTreeArr(tmp.treearr, tmp.findset[i])))
+        }
+        this.tableData = this.listToTreeWithLevel(tmpArr, '0', 0)
       }
     }
   },
@@ -182,27 +199,77 @@ export default {
     this.getData()
   },
   methods: {
-    // 递归过滤树形数据
-    filterData(data, predicate) {
-      // if no data is sent in, return null, otherwise transform the data
-      return !data ? null : data.reduce((list, entry) => {
-        let clone = null
-        if (predicate(entry)) {
-          // if the object matches the filter, clone it as it is
-          clone = Object.assign({}, entry)
-        } else if (entry.children != null) {
-          // if the object has childrens, filter the list of children
-          const children = this.filterData(entry.children, predicate)
-          if (children.length > 0) {
-            // if any of the children matches, clone the parent object, overwrite
-            // the children list with the filtered list
-            clone = Object.assign({}, entry, { children: children })
+    // 遍历json树 过滤符合条件节点，并且扁平化成array
+    TravelTree(jsonTree, filterText) {
+      var ret = {
+        treearr: [], // 转化成扁平Array 没有children节点
+        findset: [] // 符合过滤条件的节点 id 数组
+      }
+      function refining(jsonTree, filterText) {
+        const length = jsonTree.length
+        for (var i = 0; i < length; i++) {
+          ret.treearr.push({
+            id: jsonTree[i].id,
+            pid: jsonTree[i].pid,
+            title: jsonTree[i].title,
+            name: jsonTree[i].name,
+            component: jsonTree[i].component,
+            condition: jsonTree[i].condition,
+            create_time: jsonTree[i].create_time,
+            hidden: jsonTree[i].hidden,
+            icon: jsonTree[i].icon,
+            listorder: jsonTree[i].listorder,
+            path: jsonTree[i].path,
+            perm_id: jsonTree[i].perm_id,
+            redirect: jsonTree[i].redirect,
+            status: jsonTree[i].status,
+            type: jsonTree[i].type,
+            update_time: jsonTree[i].update_time
+          })
+          if (jsonTree[i].title.indexOf(filterText) > -1) {
+            ret.findset.push(jsonTree[i].id)
+          }
+          if (jsonTree[i].children) {
+            refining(jsonTree[i].children, filterText)
           }
         }
-        // if there's a cloned object, push it to the output list
-        clone && list.push(clone)
-        return list
-      }, [])
+      }
+      refining(jsonTree, filterText)
+      return ret
+    },
+    // 遍历数组treearr 找到父节点全路径
+    TravelTreeArr(treearr, id) {
+      var arr = []
+      function findpath(treearr, id) {
+        const length = treearr.length
+        for (var i = 0; i < length; i++) {
+          if (treearr[i].id === id) {
+            arr.push(treearr[i])
+            if (treearr[i].pid === 0) { // 回溯至根节点
+              return
+            } else {
+              findpath(treearr, treearr[i].pid)
+            }
+          }
+        }
+      }
+      findpath(treearr, id)
+      return arr
+    },
+    // 扁平数组转换为树形结构
+    listToTreeWithLevel(list, parent, level) {
+      var out = []
+      for (var node of list) {
+        if (node.pid === parent) {
+          // node.level = level  // 根据情况看是否需要 level
+          var children = this.listToTreeWithLevel(list, node.id, level + 1)
+          if (children.length) {
+            node.children = children
+          }
+          out.push(node)
+        }
+      }
+      return out
     },
     getData() {
       // import { createMenu, getTreeOptions, getMenuTree } from '@/api/menu'
