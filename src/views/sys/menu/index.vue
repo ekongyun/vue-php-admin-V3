@@ -189,7 +189,7 @@ export default {
         for (let i = 0; i < tmp.findset.length; i++) {
           tmpArr = _.union(_.concat(tmpArr, this.TravelTreeArr(tmp.treearr, tmp.findset[i])))
         }
-        this.tableData = this.listToTreeWithLevel(tmpArr, '0', 0)
+        this.tableData = this.listToTreeWithLevel(tmpArr, 0, 0)
       }
     }
   },
