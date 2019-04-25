@@ -24,8 +24,11 @@ export default {
   },
   data() {
     return {
-      title: '中移铁通河南分公司',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: 'EMACS',
+      // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      // https://www.emacswiki.org/pics/static/CarbonEmacsPackageIcon.png
+      // https://www.emacswiki.org/pics/static/GnuHeadGubinelli.png
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/6/66/Openlogo-debianV2.svg'
     }
   }
 }
