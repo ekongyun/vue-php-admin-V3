@@ -1,4 +1,6 @@
-# vue-php-admin 项目说明
+# vue-php-admin-V3 项目说明
+
+**V3 版本加入动态切换角色功能，不同角色功能不同，同时也可归属不同的部门**
 
 基于 vue-element-admin 和 PHP CodeIgniter RESTful 实现，
 采用前后端分离架构的权限管理系统，PHP快速开发平台，目标是搭建一
@@ -16,11 +18,11 @@
 
 ## 功能介绍
 1. 系统登录：系统用户登录，系统登录认证（token方式）
-         2. 用户管理：新建用户，修改用户，删除用户，查询用户
-         3. 角色管理：新建角色，修改角色，删除角色，查询角色
-         4. 菜单管理：新建菜单，修改菜单，删除菜单，查询菜单
-         5. 图标管理：vue-element-admin 原有封装组件
-         6. ......
+2. 用户管理：新建用户，修改用户，删除用户，查询用户
+3. 角色管理：新建角色，修改角色，删除角色，查询角色
+4. 菜单管理：新建菜单，修改菜单，删除菜单，查询菜单
+5. 图标管理：vue-element-admin 原有封装组件
+6. 机构管理：新建机构，修改机构，删除机构，查询机构
 
 ## 开发环境 
 - phpstudy  php 5.6.27 nts + Apache
@@ -33,7 +35,7 @@
 ## 使用说明
 
 ### 前端
-1. 下载前端代码解压
+1. 下载前端代码解压 [vue-php-admin-V3](https://github.com/emacle/vue-php-admin-V3.git)
 2. 修改接口配置
 
     cat config/dev.env.js
@@ -42,7 +44,7 @@
           NODE_ENV: '"development"',
           ENV_CONFIG: '"dev"',
           // BASE_API: '"https://api-dev"' 根据后端实际接口配置
-          BASE_API: '"http://www.cirest.com:8889/api/v2/"'
+          BASE_API: '"http://www.cirest.com:8889/api/v3/"'
         }
     ```
 3. 运行
@@ -51,8 +53,8 @@
     ```
 
 ### 后端
-1. 下载后端代码解压
-2. 创建数据库 vueadmin, 导入 **vueadmin.sql** 文件，尽量使用命令行导入，navcat-for-mysql导入有时会出错
+1. 下载后端代码解压  [CodeIgniter-3.1.10](https://github.com/emacle/CodeIgniter-3.1.10.git)
+2. 创建数据库 vueadmin, 导入 **vueadmin-v3.sql** 文件，尽量使用命令行导入，navcat-for-mysql导入有时会出错, 根据出错提示修改配置可成功导入
 3. 后端数据库连接配置 修改配置文件
 
     cat application\config\database.php
@@ -68,7 +70,7 @@
     ```
 4. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
 
-    www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v2/"'
+    www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v3/"'
 
     接口调用使用示例：
     ```html    
@@ -94,3 +96,13 @@
 ## 编辑器 
  - phpstrom
  - vscode
+
+## 截图
+ 
+ ![菜单](vue-element-admin/static/screenshot/menu.png)
+ ![菜单新增](vue-element-admin/static/screenshot/menu_add.png)
+ ![菜单查询](vue-element-admin/static/screenshot/menu_search.png) 
+ ![角色/授权](vue-element-admin/static/screenshot/role.png)
+ ![角色新增](vue-element-admin/static/screenshot/role2.png)
+ ![用户管理](vue-element-admin/static/screenshot/user.png)
+ ![用户新增](vue-element-admin/static/screenshot/user_add.png)

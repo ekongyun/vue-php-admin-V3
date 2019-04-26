@@ -2,17 +2,8 @@
   <div :class="{'has-logo':true}">
     <logo :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
-
-      <el-menu
-        :default-active="$route.path"
-        :collapse="isCollapse"
-        :unique-opened="true"
-        :background-color="variables.menuBg"
-        :text-color="variables.menuText"
-        :active-text-color="variables.menuActiveText"
-        mode="vertical"
-      >
-        <sidebar-item v-for="route in permission_routers" :key="route.path" :item="route" :base-path="route.path"/>
+      <el-menu :default-active="$route.path" :collapse="isCollapse" :unique-opened="true" :background-color="variables.menuBg" :text-color="variables.menuText" :active-text-color="variables.menuActiveText" mode="vertical">
+        <sidebar-item v-for="route in permission_routers" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
     </el-scrollbar>
   </div>
