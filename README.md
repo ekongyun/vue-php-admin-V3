@@ -99,8 +99,13 @@
 
 ## 截图
  
+<<<<<<< HEAD
  ![角色切换](static/screenshot/role_switch.png)
  ![菜单](static/screenshot/menu.png)
+=======
+ ![角色切换](screenshot/role_switch.png)
+ ![菜单](screenshot/menu.png)
+>>>>>>> d09158693a93c105d365360a2504eea9800f0928
  ![菜单新增](static/screenshot/menu_add.png)
  ![菜单查询](static/screenshot/menu_search.png) 
  ![角色/授权](static/screenshot/role.png)
