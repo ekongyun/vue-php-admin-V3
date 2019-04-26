@@ -101,12 +101,10 @@
  
  ![角色切换](static/screenshot/role_switch.png)
  ![菜单](static/screenshot/menu.png)
- ![角色切换](screenshot/role_switch.png)
- ![菜单](screenshot/menu.png)
  ![菜单新增](static/screenshot/menu_add.png)
  ![菜单查询](static/screenshot/menu_search.png) 
  ![角色/授权](static/screenshot/role.png)
  ![角色新增](static/screenshot/role2.png)
  ![用户管理](static/screenshot/user.png)
  ![用户新增](static/screenshot/user_add.png)
- ![机构管理](static/screenshot/deptr.png)
+ ![机构管理](static/screenshot/dept.png)
