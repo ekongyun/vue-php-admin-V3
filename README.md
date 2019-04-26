@@ -73,7 +73,7 @@
     www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v3/"'
 
     接口调用使用示例：
-    ```html    
+    ```html
     http://www.cirest.com:8889/api/v2/sys/menu/testapi
     http://www.cirest.com:8889/index.php/api/v2/sys/menu/testapi
     
@@ -99,10 +99,12 @@
 
 ## 截图
  
- ![菜单](vue-element-admin/static/screenshot/menu.png)
- ![菜单新增](vue-element-admin/static/screenshot/menu_add.png)
- ![菜单查询](vue-element-admin/static/screenshot/menu_search.png) 
- ![角色/授权](vue-element-admin/static/screenshot/role.png)
- ![角色新增](vue-element-admin/static/screenshot/role2.png)
- ![用户管理](vue-element-admin/static/screenshot/user.png)
- ![用户新增](vue-element-admin/static/screenshot/user_add.png)
+ ![角色切换](static/screenshot/role_switch.png)
+ ![菜单](static/screenshot/menu.png)
+ ![菜单新增](static/screenshot/menu_add.png)
+ ![菜单查询](static/screenshot/menu_search.png) 
+ ![角色/授权](static/screenshot/role.png)
+ ![角色新增](static/screenshot/role2.png)
+ ![用户管理](static/screenshot/user.png)
+ ![用户新增](static/screenshot/user_add.png)
+ ![机构管理](static/screenshot/deptr.png)
