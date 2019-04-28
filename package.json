@@ -60,6 +60,7 @@
     "vue": "2.5.17",
     "vue-count-to": "1.0.13",
     "vue-data-tables": "^3.4.4",
+    "vue-drag-verify": "^1.0.6",
     "vue-i18n": "7.3.2",
     "vue-password": "^1.2.0",
     "vue-password-validator": "^0.1.8",

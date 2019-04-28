@@ -24,8 +24,23 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
+      <!-- <drag-verify v-show="!vSuccess" ref="Verify" :width="width" :height="height" :text="text" :success-text="successText" :background="background" :progress-bar-bg="progressBarBg" :completed-bg="completedBg" :handler-bg="handlerBg" :handler-icon="handlerIcon" :text-size="textSize" :success-icon="successIcon" :circle="true"></drag-verify> -->
+      <drag-verify
+        v-show="!vSuccess"
+        ref="Verify"
+        :width="448"
+        :height="40"
+        :circle="true"
+        style="margin-bottom:30px;"
+        handler-icon="el-icon-d-arrow-right"
+        success-icon="el-icon-check"
+        text="拖动滑块到右侧完成验证"
+        success-text="验证成功"
+        background="#ddd"
+        progress-bar-bg="#409EFF"
+        text-size="16px"
+        @passcallback="passcallback"/>
+      <el-button v-show="vSuccess" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
         {{ $t('login.logIn') }}
       </el-button>
 
@@ -63,10 +78,11 @@
 import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
+import dragVerify from 'vue-drag-verify'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
+  components: { LangSelect, SocialSign, dragVerify },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -94,7 +110,8 @@ export default {
       passwordType: 'password',
       loading: false,
       showDialog: false,
-      redirect: undefined
+      redirect: undefined,
+      vSuccess: false
     }
   },
   watch: {
@@ -103,7 +120,11 @@ export default {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
+    },
+    vSuccess: function(newV, oldV) {
+      console.log(newV + '=>' + oldV)
     }
+
   },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
@@ -112,6 +133,10 @@ export default {
     // window.removeEventListener('hashchange', this.afterQRScan)
   },
   methods: {
+    passcallback() {
+      console.log('验证回调')
+      this.vSuccess = true
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -119,7 +144,24 @@ export default {
         this.passwordType = 'password'
       }
     },
+    resetVerify() {
+      // 恢复滑动到原点
+      console.log('恢复滑动到原点')
+      this.$refs.Verify.isMoving = false
+      this.$refs.Verify.x = 0
+      this.$refs.Verify.isPassing = false
+      this.$refs.Verify.$refs.handler.style.left = '0'
+      this.$refs.Verify.$refshandlerIcon = 'el-icon-d-arrow-right'
+      this.$refs.Verify.$refs.progressBar.style.width = '0'
+    },
     handleLogin() {
+      if (!this.$refs.Verify.isPassing) {
+        this.$message({
+          message: '滑动滑块完成验证',
+          type: 'error'
+        })
+        return
+      }
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -128,6 +170,9 @@ export default {
             this.$router.push({ path: this.redirect || '/' })
           }).catch(() => {
             this.loading = false
+            this.vSuccess = false
+            // 恢复滑动到原点
+            this.resetVerify()
           })
         } else {
           console.log('error submit!!')
@@ -173,7 +218,41 @@ $cursor: #fff;
     }
   }
 }
-
+// drag verify
+.drag_verify {
+  border-radius: 4px !important;
+  .dv_progress_bar {
+    border-radius: 4px !important;
+  }
+  .dv_handler {
+    border-radius: 4px !important;
+    top: 1px !important;
+  }
+  .dv_text {
+    background: -webkit-gradient(
+      linear,
+      left top,
+      right top,
+      color-stop(0, #4d4d4d),
+      color-stop(0.4, #4d4d4d),
+      color-stop(0.5, white),
+      color-stop(0.6, #4d4d4d),
+      color-stop(1, #4d4d4d)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-size-adjust: none;
+    -webkit-animation: slidetounlock 5s infinite;
+  }
+  @-webkit-keyframes slidetounlock {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: 200px 0;
+    }
+  }
+}
 /* reset element-ui css */
 .login-container {
   .el-input {
