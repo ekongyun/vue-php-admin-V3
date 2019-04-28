@@ -1,4 +1,5 @@
-import { asyncRouterMap, constantRouterMap } from '@/router'
+// import { asyncRouterMap, constantRouterMap } from '@/router'
+import { constantRouterMap } from '@/router'
 
 import Layout from '@/views/layout/Layout'
 
@@ -7,34 +8,34 @@ import Layout from '@/views/layout/Layout'
  * @param roles
  * @param route
  */
-function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
-  } else {
-    return true
-  }
-}
+// function hasPermission(roles, route) {
+//   if (route.meta && route.meta.roles) {
+//     return roles.some(role => route.meta.roles.includes(role))
+//   } else {
+//     return true
+//   }
+// }
 
 /**
  * 递归过滤异步路由表，返回符合用户角色权限的路由表
  * @param routes asyncRouterMap
  * @param roles
  */
-function filterAsyncRouter(routes, roles) {
-  const res = []
+// function filterAsyncRouter(routes, roles) {
+//   const res = []
 
-  routes.forEach(route => {
-    const tmp = { ...route }
-    if (hasPermission(roles, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRouter(tmp.children, roles)
-      }
-      res.push(tmp)
-    }
-  })
+//   routes.forEach(route => {
+//     const tmp = { ...route }
+//     if (hasPermission(roles, tmp)) {
+//       if (tmp.children) {
+//         tmp.children = filterAsyncRouter(tmp.children, roles)
+//       }
+//       res.push(tmp)
+//     }
+//   })
 
-  return res
-}
+//   return res
+// }
 
 /**
  *将后台的路由表进行格式化
@@ -64,7 +65,7 @@ function generateRouter(item, isParent) {
   // name string-random 生成唯一字符串 xxxoo_sys_menu 形式 6个随机字符 + path 转换
   // redirect： 判断如果是一级菜单 noredirect
   // component: 判断如果是一级菜单component: Layout
-  console.log(item.component)
+  // console.log(item.component)
 
   var router = {
     path: item.path,
@@ -76,9 +77,10 @@ function generateRouter(item, isParent) {
     // 面包屑上 点击 redirect 的 url  首页/系统管理/菜单管理  , 可点击系统管理
     redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
     // component: isParent ? Layout : componentsMap[item.name],
-    alwaysShow: item.children.length === 1 ? true : false
+    // alwaysShow: item.children.length === 1 ? true : false
+    alwaysShow: item.children.length === 1
   }
-  console.log('router....', router)
+  // console.log('router....', router)
   return router
 }
 
@@ -136,9 +138,9 @@ const permission = {
         //     ]
         //   }
         // ]
-        console.log('asyncRouterMap.........', asyncRouterMap)
+        // console.log('asyncRouterMap.........', asyncRouterMap)
         const accessedRouters = convertRouter(asyncRouterMap)
-        console.log('accessedRouters.........', accessedRouters)
+        // console.log('accessedRouters.........', accessedRouters)
         commit('SET_ROUTERS', accessedRouters)
         resolve()
       })

@@ -247,9 +247,9 @@ export default {
       }
     },
     'temp.roledept': function(newV, oldV) {
-      console.log(oldV)
-      console.log('===>')
-      console.log(newV)
+      // console.log(oldV)
+      // console.log('===>')
+      // console.log(newV)
     }
   },
   created() {
@@ -270,16 +270,16 @@ export default {
       return subset
     },
     removeTag(args) {
-      console.log('removeTag...')
-      console.log(args)
+      // console.log('removeTag...')
+      // console.log(args)
       return
     },
     // 获取数据
     fetchData(queryInfo) {
-      console.log('queryInfo', queryInfo)
+      // console.log('queryInfo', queryInfo)
       if (!queryInfo) {
         queryInfo = this.defaultQueryInfo
-        console.log(queryInfo)
+        // console.log(queryInfo)
       }
       // init 类型比较特殊在 created 时发射，保存默认的查询信息，更新数据后调用 fetchData 时 queryInfo为空时调用
       // if (queryInfo.type === 'init') {
@@ -291,7 +291,7 @@ export default {
 
       this.listLoading = true
       getUserList(queryInfo).then(res => {
-        console.log('getUserList', res)
+        // console.log('getUserList', res)
         this.list = res.data.items
         this.total = res.data.total
         this.listLoading = false
@@ -347,7 +347,7 @@ export default {
       this.readonly = false
     },
     handleCreate() {
-      console.log('handleCreate...click')
+      // console.log('handleCreate...click')
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -391,7 +391,7 @@ export default {
           // 调用api创建数据入库
           createUser(this.temp).then(res => {
             // 成功后 关闭窗口
-            console.log('createUser...', res)
+            // console.log('createUser...', res)
             if (res.type === 'success') {
               this.fetchData()
               this.dialogFormVisible = false
@@ -406,7 +406,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      console.log(this.temp)
+      // console.log(this.temp)
       this.readonly = true // 用户名不能修改, 只能删除
 
       this.dialogStatus = 'update'

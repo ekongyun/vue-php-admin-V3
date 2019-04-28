@@ -282,7 +282,7 @@ export default {
     },
     // 角色选择改变监听
     handleRoleSelectChange(val) {
-      console.log(val)
+      // console.log(val)
       if (val === null || val.id === null) {
         return
       }
@@ -294,7 +294,7 @@ export default {
 
       getRoleRole({ 'roleId': this.selectRole.id }).then((res) => {
         this.currentRoleRoles = res.data
-        console.log('currentRoleRoles', this.currentRoleRoles)
+        // console.log('currentRoleRoles', this.currentRoleRoles)
         this.$refs.roleTable.$refs.elTable.clearSelection()
         for (let i = 0; i < this.currentRoleRoles.length; i++) {
           for (let index = 0; index < this.roleData.length; index++) {
@@ -414,7 +414,7 @@ export default {
       }
     },
     handleCreate() {
-      console.log('handleCreate...click')
+      // console.log('handleCreate...click')
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -425,12 +425,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('createData valid done...', this.temp)
+          // console.log('createData valid done...', this.temp)
 
           // 调用api创建数据入库
           createRole(this.temp).then(res => {
             // 成功后 关闭窗口
-            console.log('createRole...', res)
+            // console.log('createRole...', res)
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({

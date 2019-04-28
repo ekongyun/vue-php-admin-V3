@@ -181,7 +181,7 @@ export default {
       this.readonly = false
     },
     handleCreate() {
-      console.log('handleCreate...click')
+      // console.log('handleCreate...click')
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -196,7 +196,7 @@ export default {
           // 调用api创建数据入库
           createDept(this.temp).then(res => {
             // 成功后 关闭窗口
-            console.log('createDept...', res)
+            // console.log('createDept...', res)
             if (res.type === 'success') {
               this.fetchData()
               this.dialogFormVisible = false

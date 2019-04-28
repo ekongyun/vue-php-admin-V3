@@ -88,11 +88,11 @@ export default {
       'device'
     ]),
     currentRole() {
-      console.log('currentRole computed...', this.$store.getters.role_id)
+      // console.log('currentRole computed...', this.$store.getters.role_id)
       return this.$store.getters.role_id
     },
     Roles() {
-      console.log('Roles computed...', this.$store.getters.roles)
+      // console.log('Roles computed...', this.$store.getters.roles)
       return this.$store.getters.roles
     }
   },

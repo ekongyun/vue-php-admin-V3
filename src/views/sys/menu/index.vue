@@ -288,7 +288,7 @@ export default {
     getData() {
       // import { createMenu, getTreeOptions, getMenuTree } from '@/api/menu'
       getMenuTree().then(res => {
-        console.log('getMenuTree', res)
+        // console.log('getMenuTree', res)
         this.tableData = res.data
         this.tableDatax = res.data
         // 展开所有行
@@ -301,20 +301,20 @@ export default {
     },
     editItem(row) {
       this.tempItem = Object.assign({}, row)
-      console.log(row)
-      console.log(row.id)
+      // console.log(row)
+      // console.log(row.id)
       this.dialogFormVisible = true
     },
     async updateItem() {
       await this.$refs.TreeTable.updateTreeNode(this.tempItem)
       this.dialogFormVisible = false
-      console.log(this.tempItem.id)
+      // console.log(this.tempItem.id)
     },
     deleteItem(row) {
       this.$refs.TreeTable.delete(row)
     },
     selectChange(val) {
-      console.log(val)
+      // console.log(val)
     },
     message(row) {
       this.$message.info(row.event)
@@ -334,7 +334,7 @@ export default {
       }
     },
     handleCreate() {
-      console.log('handleCreate...click')
+      // console.log('handleCreate...click')
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -358,7 +358,7 @@ export default {
         if (valid) {
           // 处理路由别名生成唯一 /sys/menu
           this.temp.name = this.stringToCamel(this.temp.path + '/' + random(4, { specials: false, numbers: false, letters: 'abcdefghijklmnopqrstuvwxyz' }))
-          console.log('createData valid done...', this.temp)
+          // console.log('createData valid done...', this.temp)
 
           // 调用api创建数据入库
           createMenu(this.temp).then(res => {
@@ -402,7 +402,7 @@ export default {
             redirect: this.temp.redirect,
             listorder: this.temp.listorder
           }
-          console.log(tempData)
+          // console.log(tempData)
           // TODO: 增加校验 rules:
           if (tempData.pid === tempData.id) {
             this.$notify({
@@ -480,8 +480,8 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       // this.getList()
-      console.log('handleFilter')
-      console.log(this.tableData)
+      // console.log('handleFilter')
+      // console.log(this.tableData)
       // const result = this.deal(this.tableData, node => node.title.toLowerCase().includes(this.searfilterTextch.toLowerCase()))
       // // console.log('result', result)
       // this.tableData.filter = result

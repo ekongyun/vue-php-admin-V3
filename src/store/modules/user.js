@@ -49,9 +49,7 @@ const user = {
       state.role_id = roles
     },
     SET_PHONE: (state, phone) => {
-      console.log('..............phone.....')
       state.phone = phone
-      console.log('state', state)
     },
     SET_IDENTIFY: (state, identify) => {
       state.identify = identify
