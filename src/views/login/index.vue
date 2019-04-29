@@ -28,10 +28,9 @@
       <drag-verify
         v-show="!vSuccess"
         ref="Verify"
-        :width="448"
-        :height="40"
+        :height="39"
         :circle="true"
-        style="margin-bottom:30px;"
+        style="width:100%;margin-bottom:30px;"
         handler-icon="el-icon-d-arrow-right"
         success-icon="el-icon-check"
         text="拖动滑块到右侧完成验证"
@@ -40,7 +39,7 @@
         progress-bar-bg="#409EFF"
         text-size="16px"
         @passcallback="passcallback"/>
-      <el-button v-show="vSuccess" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
+      <el-button v-if="vSuccess" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
         {{ $t('login.logIn') }}
       </el-button>
 
@@ -120,11 +119,7 @@ export default {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
-    },
-    vSuccess: function(newV, oldV) {
-      console.log(newV + '=>' + oldV)
     }
-
   },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
@@ -134,7 +129,6 @@ export default {
   },
   methods: {
     passcallback() {
-      console.log('验证回调')
       this.vSuccess = true
     },
     showPwd() {
